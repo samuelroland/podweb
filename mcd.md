@@ -53,22 +53,22 @@ entity QueuedEpisode {
 }
 
 'Relationships
-Podcast "1" o-"*" Episode
+User [name] "1"--"*" Playlist: create
+Podcast "1" o--"*" Episode
 'TODO: arrow direction is correct ?
 Podcast "*"--"*" Category: categorize <
-Episode "*"--"*" User: listen >
+Episode "*"-"*" User: listen >
 (Episode, User) . Listening
-User [name] "1"-"*" Playlist: create
-Episode "*"--"*" User: queue <
-Playlist "*"--"*" Episode: list >
+Playlist "*"-up-"*" Episode: list >
+Episode "*"-"*" User: queue <
 
-' note "CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue." as N1
-' note "CI: The combination of QueuedEpisode's index \nand associated user is unique." as N2
-' N1 .. QueuedEpisode
-' N2 .. QueuedEpisode
-' QueuedEpisode .. (User, Episode)
-' note "CI: There's at max one listening entry linking\na podcast episode and a user" as N3
-
+note "CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue." as N1
+note "CI: The combination of QueuedEpisode's index \nand associated user is unique." as N2
+N1 .up. QueuedEpisode
+N2 .left. QueuedEpisode
+QueuedEpisode .left.... (User, Episode)
+note "CI: There's at max one listening entry linking\na podcast episode and a user." as N3
+N3 .. Listening
 ```
 
 **Remarques:**
