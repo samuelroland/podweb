@@ -4,6 +4,7 @@
 scale 1.5
 hide circle
 ' skinparam linetype ortho
+' skinparam linetype polyline
 skinparam fixCircleLabelOverlapping true
 skinparam classAttributeIconSize 0
 hide methods
@@ -23,7 +24,6 @@ entity Podcast {
 	image
 	author
 	episodes_count 
-	'ok ??
 }
 
 entity Episode {
@@ -53,21 +53,21 @@ entity QueuedEpisode {
 }
 
 'Relationships
-User [name] "1"--"*" Playlist: create
-Podcast "1" o--"*" Episode
+User [name] "1"-"*" Playlist: create
+Podcast "1" o-left-"*" Episode
 'TODO: arrow direction is correct ?
-Podcast "*"--"*" Category: categorize <
-Episode "*"-"*" User: listen >
-(Episode, User) . Listening
-Playlist "*"-up-"*" Episode: list >
+Podcast "*"-"*" Category: categorize <
+Episode "*"--"*" User: listen >
+Listening . (Episode, User)
+Playlist "*"-"*" Episode: list >
 Episode "*"-"*" User: queue <
 
 note "CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue." as N1
-note "CI: The combination of QueuedEpisode's index \nand associated user is unique." as N2
-N1 .up. QueuedEpisode
-N2 .left. QueuedEpisode
-QueuedEpisode .left.... (User, Episode)
-note "CI: There's at max one listening entry linking\na podcast episode and a user." as N3
+note "CI: The combination \nof QueuedEpisode's index \nand associated user is unique." as N2
+QueuedEpisode . N1
+QueuedEpisode .. N2
+(User, Episode) . QueuedEpisode
+note "CI: There's at max one \nlistening entry linking\na podcast episode and a user." as N3
 N3 .. Listening
 ```
 
@@ -80,5 +80,3 @@ N3 .. Listening
     1.  `listening_count` est le nombre total d'écoute entre un utilisateur et un épisode. Cette valeur est incrémentée chaque fois que l'écoute atteint 100%.
 1. Playlist
    1. La combinaison du nom de la playlist et de l'email de l'utilisateur est unique. Cela ne fait pas de sens d'avoir 2 playlists du même nom sur son compte.
-
-
