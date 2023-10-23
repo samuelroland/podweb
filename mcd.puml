@@ -1,0 +1,68 @@
+scale 1.5
+hide circle
+' skinparam linetype ortho
+' skinparam linetype polyline
+skinparam fixCircleLabelOverlapping true
+skinparam classAttributeIconSize 0
+hide methods
+
+'Entities
+entity User {
+	firstname
+	lastname
+	{static} email
+	password
+}
+
+entity Podcast {
+	title
+	description
+	{static} rss_feed
+	image
+	author
+	episodes_count 
+}
+
+entity Episode {
+	title
+	description
+	duration
+	released_at
+	{static} audio_url
+}
+
+entity Listening {
+	progression
+	listening_count
+}
+
+entity Category {
+	{static} name
+}
+
+entity Playlist {
+	'unique seulement sur la combinaison name+auteur.
+	description
+}
+
+entity QueuedEpisode {
+	index
+}
+
+'Relationships
+User [name] "1"-"*" Playlist: create
+Podcast "1" o-left-"*" Episode
+'TODO: arrow direction is correct ?
+Podcast "*"-"*" Category: categorize <
+Episode "*"--"*" User: listen >
+Listening . (Episode, User)
+Playlist "*"-"*" Episode: list >
+Episode "*"-"*" User: queue <
+
+note "CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue." as N1
+note "CI: The combination \nof QueuedEpisode's index \nand associated user is unique." as N2
+QueuedEpisode . N1
+QueuedEpisode .. N2
+(User, Episode) . QueuedEpisode
+note "CI: There's at max one \nlistening entry linking\na podcast episode and a user." as N3
+N3 .. Listening
