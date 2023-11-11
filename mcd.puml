@@ -49,6 +49,20 @@ entity QueuedEpisode {
 	index
 }
 
+entity Badge {
+	name
+	points
+	description
+	type
+	condition_value
+}
+
+entity Comment {
+	note
+	content
+	date
+}
+
 'Relationships
 User [name] "1"-"*" Playlist: create
 Podcast "1" o-left-"*" Episode
