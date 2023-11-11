@@ -50,3 +50,25 @@ La base de données ([téléchargeable ici](https://public.podcastindex.org/podc
 
 Il nous restera ainsi à générer aléatoirement des utilisateurs et des playlists avec des épisodes, des écoutes d'épisodes pour chaque utilisateur. Une partie des utilisateurs auront déjà des files d'attentes remplies avec quelques épisodes. Au final, nous aurons donc une base de données légère avec seulement les attributs des podcasts qui nous intéressent et les autres tables.
 
+## Badges
+Nous allons développer un système de *badges* attribués aux utilisateurs quand ils atteignent un certain nombres d'écoutes ou 
+
+| Type             | Name           | Points        | Condition          | Description                                                      |
+| ---------------- | -------------- | ------------- | ------------------ | ---------------------------------------------------------------- |
+| ListeningCount   |                |               | 20                 |                                                                  |
+| ListeningCount   |                |               | 50                 |                                                                  |
+|                  |                |               |                    |                                                                  |
+| ListeningCount   | PetaListener   | 100000000 pts | 10000 listenings   | You are a peta listener, do you even have a life ?               |
+| RegistrationDate | BabyCaster     | 100 pts       | 1 month passed     | You are not new as a month ago...                                |
+| RegistrationDate | TeenCaster     | 300 pts       | 6 months passed    | Starting to rebel as a teen listening to podcasts instead of TV. |
+| RegistrationDate | MatureCaster   | 1000 pts      | 1 year passed      |                                                                  |
+| RegistrationDate | SagedCaster    | 5000 pts      | 5 years passed     |                                                                  |
+| PlaylistCreation | PlaylistNewbie | 40 pts        | created 1 playlist | You find the best button !                                       |
+| PlaylistCreation | ?              | ? pts         | ?                  | ??                                                               |
+
+Les 3 types suivants signifient:
+1. `ListeningCount`: le badge sera attribué à partir d'un certain nombre d'écoutes d'épisodes (2 écoutes du même épisode compte bien 2 fois)
+1. `RegistrationDate`: le badge sera attribué à partir d'un certain temps passé après la date de création de compte
+1. `PlaylistCreation`: le badge sera attribué à partir d'un certain nombres de playlists créées
+
+L'attribution des badges pourra probablement se faire via des triggers développé en SQL qui s'exécutera à chaque fois qu'une écoute est ajoutée par ex.
