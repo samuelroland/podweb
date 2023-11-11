@@ -6,7 +6,9 @@ TODO pour rendu 3:
    1. Ajout date de création de compte (registration_date) aux users (pour un des types de badges)
    1. Commentaires
    1. Badges
-   1. MLD: table de jointure genre "win" entre users et badges
+   1. Lien Badges-Users (pour MLD: table de jointure genre "win")
+   1. Lien User-Commentaires
+   1. Lien Episode-Commentaires
    1. Ajouter version 2 sur le MCD et MLD (MCD: ajouter une note comme celle du MLD actuellement)
 1. Check qu'on a inclut les CI si possible dans le MLD
 1. Rexporter le MCD en SVG
