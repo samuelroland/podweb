@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`users` (
   `lastname` VARCHAR(100) NOT NULL,
   `email` VARCHAR(254) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
+  `registration_date` DATETIME NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
 ENGINE = InnoDB
@@ -38,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`playlists` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`episodes` (
+CREATE TABLE IF NOT EXISTS `mydb`.`badges` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
@@ -48,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`episodes` (
   `podcast_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `audio_url_UNIQUE` (`audio_url` ASC) VISIBLE,
-  INDEX `fk_episodes_podcasts_idx` (`podcast_id` ASC) VISIBLE,
-  CONSTRAINT `fk_episodes_podcasts`
+  INDEX `fk_badges_podcasts_idx` (`podcast_id` ASC) VISIBLE,
+  CONSTRAINT `fk_badges_podcasts`
     FOREIGN KEY (`podcast_id`)
     REFERENCES `mydb`.`podcasts` (`id`)
     ON DELETE CASCADE
@@ -64,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`podcasts` (
   `rss_feed` VARCHAR(2000) NOT NULL,
   `image` VARCHAR(2000) NOT NULL,
   `author` VARCHAR(200) NOT NULL,
-  `episodes_count` MEDIUMINT(9) NOT NULL,
+  `badges_count` MEDIUMINT(9) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `rss_feed_UNIQUE` (`rss_feed` ASC) VISIBLE)
 ENGINE = InnoDB
@@ -101,14 +102,14 @@ CREATE TABLE IF NOT EXISTS `mydb`.`queue` (
   `user_id` INT(11) NOT NULL,
   `index` SMALLINT(6) NULL DEFAULT NULL,
   PRIMARY KEY (`episode_id`, `user_id`),
-  INDEX `fk_episodes_has_users_users1_idx` (`user_id` ASC) VISIBLE,
-  INDEX `fk_episodes_has_users_episodes1_idx` (`episode_id` ASC) VISIBLE,
-  CONSTRAINT `fk_episodes_has_users_episodes1`
+  INDEX `fk_badges_has_users_users1_idx` (`user_id` ASC) VISIBLE,
+  INDEX `fk_badges_has_users_badges1_idx` (`episode_id` ASC) VISIBLE,
+  CONSTRAINT `fk_badges_has_users_badges1`
     FOREIGN KEY (`episode_id`)
-    REFERENCES `mydb`.`episodes` (`id`)
+    REFERENCES `mydb`.`badges` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_episodes_has_users_users1`
+  CONSTRAINT `fk_badges_has_users_users1`
     FOREIGN KEY (`user_id`)
     REFERENCES `mydb`.`users` (`id`)
     ON DELETE NO ACTION
@@ -122,14 +123,14 @@ CREATE TABLE IF NOT EXISTS `mydb`.`listen` (
   `progression` INT(11) NOT NULL,
   `listening_count` TINYINT(4) NULL DEFAULT NULL,
   PRIMARY KEY (`episode_id`, `user_id`),
-  INDEX `fk_episodes_has_users_users2_idx` (`user_id` ASC) VISIBLE,
-  INDEX `fk_episodes_has_users_episodes2_idx` (`episode_id` ASC) VISIBLE,
-  CONSTRAINT `fk_episodes_has_users_episodes2`
+  INDEX `fk_badges_has_users_users2_idx` (`user_id` ASC) VISIBLE,
+  INDEX `fk_badges_has_users_badges2_idx` (`episode_id` ASC) VISIBLE,
+  CONSTRAINT `fk_badges_has_users_badges2`
     FOREIGN KEY (`episode_id`)
-    REFERENCES `mydb`.`episodes` (`id`)
+    REFERENCES `mydb`.`badges` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_episodes_has_users_users2`
+  CONSTRAINT `fk_badges_has_users_users2`
     FOREIGN KEY (`user_id`)
     REFERENCES `mydb`.`users` (`id`)
     ON DELETE NO ACTION
@@ -141,21 +142,69 @@ CREATE TABLE IF NOT EXISTS `mydb`.`list` (
   `playlist_id` INT(11) NOT NULL,
   `episode_id` INT(11) NOT NULL,
   PRIMARY KEY (`playlist_id`, `episode_id`),
-  INDEX `fk_playlists_has_episodes_episodes1_idx` (`episode_id` ASC) VISIBLE,
-  INDEX `fk_playlists_has_episodes_playlists1_idx` (`playlist_id` ASC) VISIBLE,
-  CONSTRAINT `fk_playlists_has_episodes_playlists1`
+  INDEX `fk_playlists_has_badges_badges1_idx` (`episode_id` ASC) VISIBLE,
+  INDEX `fk_playlists_has_badges_playlists1_idx` (`playlist_id` ASC) VISIBLE,
+  CONSTRAINT `fk_playlists_has_badges_playlists1`
     FOREIGN KEY (`playlist_id`)
     REFERENCES `mydb`.`playlists` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playlists_has_episodes_episodes1`
+  CONSTRAINT `fk_playlists_has_badges_badges1`
     FOREIGN KEY (`episode_id`)
-    REFERENCES `mydb`.`episodes` (`id`)
+    REFERENCES `mydb`.`badges` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+--TODO verifier tables rajoutées v
+--TODO auto-asspciation comments
+CREATE TABLE IF NOT EXISTS `mydb`.`badges` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(30) NOT NULL,
+  `points` INT(11) NOT NULL,
+  `description` VARCHAR(250) NOT NULL,
+  `type` VARCHAR(200) NOT NULL,
+  `condition_value` INT(11) NOT NULL
+  PRIMARY KEY(`id`),
+  UNIQUE INDEX`name_UNIQUE` (`name` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `mydb`.`comments` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `note` TINYINT(4) NOT NULL,
+  `content` VARCHAR(2000) NOT NULL,
+  `date` DATETIME NOT NULL,
+  PRIMARY KEY(`id`),
+  INDEX `fk_comments_users1_idx` (`user_id` ASC) VISIBLE,
+  UNIQUE INDEX `user_comments_unique` (`id` ASC, `user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_commments_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `mydb`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `mydb`.`obtain` (
+  `badge_id` INT(11) NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  PRIMARY KEY (`badge_id`, `user_id`),
+  INDEX `fk_badges_has_users_users2_idx` (`user_id` ASC) VISIBLE,
+  INDEX `fk_badges_has_users_badges2_idx` (`badge_id` ASC) VISIBLE,
+  CONSTRAINT `fk_badges_has_users_badges2`
+    FOREIGN KEY (`badge_id`)
+    REFERENCES `mydb`.`badges` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_badges_has_users_users2`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `mydb`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

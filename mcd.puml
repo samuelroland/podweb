@@ -12,6 +12,7 @@ entity User {
 	lastname
 	{static} email
 	password
+	registration_date
 }
 
 entity Podcast {
@@ -50,7 +51,7 @@ entity QueuedEpisode {
 }
 
 entity Badge {
-	name
+	{static}name
 	points
 	description
 	type
@@ -68,10 +69,14 @@ User [name] "1"-"*" Playlist: create
 Podcast "1" o-left-"*" Episode
 'TODO: arrow direction is correct ?
 Podcast "*"-"*" Category: categorize <
-Episode "*"--"*" User: listen >
+Episode "*"-"*" User: listen >
 Listening . (Episode, User)
 Playlist "*"-"*" Episode: list >
 Episode "*"-"*" User: queue <
+User "1"-left-"*" [id] Comment : post >
+Comment "*"-"1" Episode : has <
+Badge "*"-right-"*" User : obtain <
+Comment "1"-"*" Comment : respond <
 
 note "CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue." as N1
 note "CI: The combination \nof QueuedEpisode's index \nand associated user is unique." as N2
@@ -80,3 +85,5 @@ QueuedEpisode .. N2
 (User, Episode) . QueuedEpisode
 note "CI: There's at max one \nlistening entry linking\na podcast episode and a user." as N3
 N3 .. Listening
+note "CI: A comment cannot be the reply of itself" as N4
+N4 . Comment
