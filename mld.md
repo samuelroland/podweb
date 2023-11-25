@@ -1,29 +1,39 @@
 # Modèle logique de données - Podweb
 
 TODO pour rendu 3:
-1. Finir la rédaction des badges
-1. update MCD et MLD avec éléments suivants
-   1. Ajout date de création de compte (registration_date) aux users (pour un des types de badges)
-   1. Commentaires
-   1. Badges
-   1. Lien Badges-Users (pour MLD: table de jointure genre "win")
-   1. Lien User-Commentaires
-   1. Lien Episode-Commentaires
-   1. Ajouter version 2 sur le MCD et MLD (MCD: ajouter une note comme celle du MLD actuellement)
-1. Check qu'on a inclut les CI si possible dans le MLD
-1. Rexporter le MCD en SVG
-1. Rexporter le MLD en SVG (je peux le crop après)
-1. Exporter le SQL depuis workbench
-1. Ajouter un entête au SQL (laisser que c'est autogénéré remettre le même entete que le MLD)
-1. Check contrainte d'unicité sur les groupes playlist.name+user.id
+1. Ajouter un entête au SQL (laisser que c'est les 2 premières ligne comme quoi c'est autogénéré et remettre en plus le même entete que le MLD)
+1. Check SQL compatible sur Postgresql ou le modifier si besoin. Le script doit pouvoir être lancé sans erreur.
+1. Check contrainte d'unicité sur la combinaison playlist.name+user.id dans le SQL généré
 
-## Changement du MCD
+## Changement du MCD - Version 2
 ![mcd.svg](mcd.svg)
 
-TODO: documenter vite fait les changements et ajouts (en une mini liste de 3-4 points)
+Comme demandé par notre enseignant, nous avons ajouté 2 tables supplémentaires au MCD et donc au MLD et fait les modifications suivantes depuis le dernier rendu:
+1. Les badges obtenus par des utilisateurs
+1. Les commentaires postés par des utilisateurs sur des épisodes, répondant potentiellement à d'autres commentaires dans le même épisode.
+1. Ajout de la date de création de compte dans User (utile pour un des types de badges)
 
-## MLD
+## MLD - Version 2
+Notre MLD a été fait dans MySQL Workbench et correspond au MCD v2, les contraintes plus avancées non visibles ont été également configurées. Elles sont visibles dans le SQL.
 ![mld.svg](mld.svg)
 
+## SQL
+Nous avons utilisé l'export SQL depuis MySQL Workbench pour générer le script SQL de création du schéma de la base de données, voir fichier `podweb-schema.sql`.
 
-TODO: inclure une copie du texte sur le système de badges ici pour qu'ils aient le contexte ?
+## Badges
+Nous allons développer un système de *badges* attribués aux utilisateurs quand ils atteignent certains niveaux d'engagement sur Podweb. La liste détaillées des badges sera définie plus tard, mais voici 2-3 exemples qui justifient notre modèle de donnée.
+| Type             | Name         | Points        | Condition        | Description                                                      |
+| ---------------- | ------------ | ------------- | ---------------- | ---------------------------------------------------------------- |
+| ListeningCount   | PetaListener | 100000000 pts | 10000 listenings | You are a peta listener, do you even have a life ?               |
+| RegistrationDate | BabyCaster   | 100 pts       | 1 month passed   | You are not new as a month ago...                                |
+| RegistrationDate | TeenCaster   | 300 pts       | 6 months passed  | Starting to rebel as a teen listening to podcasts instead of TV. |
+
+Les 4 types suivants sont possibles:
+1. `ListeningCount`: le badge sera attribué à partir d'un certain **nombre d'écoutes d'épisodes** (2 écoutes du même épisode compte bien 2 fois)
+1. `RegistrationDate`: le badge sera attribué à partir d'un certain **temps passé après la date de création de compte**
+1. `PlaylistCreation`: le badge sera attribué à partir d'un certain nombres **de playlists créées**
+1. `CommentsCount`: le badge sera attribué à partir d'un certain nombres de **commentaires postés**
+
+L'attribution des badges pourra probablement se faire via des triggers développé en SQL qui s'exécutera à chaque fois qu'une écoute est ajoutée par ex.
+
+Ce fonctionnement nous on permit de définir les besoins de champs name, type, points, description and condition_value sur les badges dans notre MCD et MLD.
