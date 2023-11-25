@@ -6,6 +6,7 @@ skinparam fixCircleLabelOverlapping true
 skinparam classAttributeIconSize 0
 hide methods
 
+
 'Entities
 entity User {
 	firstname
@@ -74,16 +75,16 @@ Listening . (Episode, User)
 Playlist "*"-"*" Episode: list >
 Episode "*"-"*" User: queue <
 User "1"-left-"*" [id] Comment : post >
-Comment "*"-"1" Episode : has <
-Badge "*"-right-"*" User : obtain <
-Comment "1"-"*" Comment : respond <
+'TODO: should we really add this id identifier and a weak entity ??
+Comment "*"--"1  " Episode : has <
+User "*"--"*" Badge : obtain >
+Comment "1"-left-"*" Comment : respond <
 
-note "CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue." as N1
-note "CI: The combination \nof QueuedEpisode's index \nand associated user is unique." as N2
-QueuedEpisode . N1
-QueuedEpisode .. N2
+note right of QueuedEpisode: CI: Users cannot have \na given episode \nmore than one time in \ntheir listening queue.
+note bottom of QueuedEpisode: CI: The combination \nof QueuedEpisode's index \nand associated user is unique.
 (User, Episode) . QueuedEpisode
 note "CI: There's at max one \nlistening entry linking\na podcast episode and a user." as N3
-N3 .. Listening
-note "CI: A comment cannot be the reply of itself" as N4
-N4 . Comment
+Listening .. N3
+note top of Comment: CI: A comment cannot reply to itself\nand a can reply to other comments\nonly in the same episode.
+
+note "Project: Podweb\nVersion: 2\nDate:26.11.2023" as N5
