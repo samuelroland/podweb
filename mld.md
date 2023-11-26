@@ -1,10 +1,5 @@
 # Modèle logique de données - Podweb
 
-TODO pour rendu 3:
-1. Ajouter un entête au SQL (laisser que c'est les 2 premières ligne comme quoi c'est autogénéré et remettre en plus le même entete que le MLD)
-1. Check SQL compatible sur Postgresql ou le modifier si besoin. Le script doit pouvoir être lancé sans erreur.
-1. Check contrainte d'unicité sur la combinaison playlist.name+user.id dans le SQL généré
-
 ## Changement du MCD - Version 2
 ![mcd.svg](mcd.svg)
 
