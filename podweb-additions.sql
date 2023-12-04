@@ -12,7 +12,21 @@ AS
 	INNER JOIN episodes_ranking ON episodes_ranking.podcast_id = podcast_id
 	GROUP BY podcast_id, p.id;
 
+CREATE OR REPLACE FUNCTION listening_badge_check
+RETURNS TRIGGER AS
+$$
+BEGIN;
+IF NEW.listening_count IS NOT OLD.listening_count
+	FOR badge in (SELECT * FROM badges where type = 'ListeningCount')
+		LOOP
+		IF -- TODO: continue
+		END LOOP;
+END IF;
+END;
+$$
+LANGUAGE PLPGSQL
+
 CREATE OR REPLACE TRIGGER listening_change
-AFTER UPDATE ON listen FOR listening_count OR INSERT ON listen
+AFTER INSERT OR UPDATE ON listen
 FOR EACH ROW
 EXECUTE FUNCTION listening_badge_check();
