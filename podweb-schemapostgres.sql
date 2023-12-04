@@ -5,13 +5,13 @@
 -- Version: 2.0
 
 -- Drop schema if exists
-DROP SCHEMA IF EXISTS mydb CASCADE;
+DROP SCHEMA IF EXISTS podweb CASCADE;
 
 -- Create schema
-CREATE SCHEMA mydb;
+CREATE SCHEMA podweb;
 
 -- Use schema
-SET search_path TO mydb;
+SET search_path TO podweb;
 
 -- Table users
 CREATE TABLE users (
