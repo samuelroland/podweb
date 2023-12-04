@@ -11,3 +11,8 @@ AS
 	SELECT p.id, p.title, p.image, p.author, sum(count) as count from podcasts p
 	INNER JOIN episodes_ranking ON episodes_ranking.podcast_id = podcast_id
 	GROUP BY podcast_id, p.id;
+
+CREATE OR REPLACE TRIGGER listening_change
+AFTER UPDATE ON listen FOR listening_count OR INSERT ON listen
+FOR EACH ROW
+EXECUTE FUNCTION listening_badge_check();
