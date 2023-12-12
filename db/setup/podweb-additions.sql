@@ -45,7 +45,7 @@ BEGIN
 
     -- Check if it's a different day
     IF days_diff IS DISTINCT FROM DATE_PART('day', now() - OLD.registration_date) THEN
-        -- Iterate through the badges with type 1
+        -- Iterate through the badges with type 1, type 1 is RegistrationDate
         FOR badge IN SELECT * FROM badges WHERE type = 1 LOOP
             -- Check if the condition value matches the days difference
             IF days_diff = badge.condition_value THEN
@@ -61,13 +61,86 @@ END;
 $$
 LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION playlist_badge_check()
+RETURNS TRIGGER AS
+$$
+DECLARE
+    badge RECORD;
+    count_playlists INT;
+    badge_exists INT;
+BEGIN
+
+    SELECT COUNT(*) INTO count_playlists FROM playlists WHERE user_id = NEW.user_id;
+
+	IF NEW.count_playlists IS DISTINCT FROM OLD.count_playlists THEN
+	    -- Check si le badge existe déjà, au cas ou on enlève une playlist
+        SELECT COUNT(*) INTO badge_exists FROM obtain WHERE user_id = NEW.user_id AND badge_id = NEW.badge_id;
+        IF(badge_exists >= 1) THEN
+            EXIT;
+        END IF;
+	    -- PlaylistCreation est le type 2
+		FOR badge IN SELECT * FROM badges WHERE type = 2 LOOP
+			IF NEW.count_playlists = badge.condition_value THEN
+			    INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge.id);
+			    EXIT;
+			END IF;
+
+		END LOOP;
+	END IF;
+	RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION comments_badge_check()
+RETURNS TRIGGER AS
+$$
+DECLARE
+    badge RECORD;
+    count_comments INT;
+    badge_exists INT;
+BEGIN
+
+    SELECT COUNT(*) INTO count_comments FROM comments WHERE user_id = NEW.user_id;
+
+	IF NEW.count_comments IS DISTINCT FROM OLD.count_comments THEN
+	    -- Check si le badge existe déjà, au cas ou on enlève une playlist
+        SELECT COUNT(*) INTO badge_exists FROM obtain WHERE user_id = NEW.user_id AND badge_id = NEW.badge_id;
+        IF(badge_exists >= 1) THEN
+            EXIT;
+        END IF;
+	    -- CommentsCount est le type 3
+		FOR badge IN SELECT * FROM badges WHERE type = 3 LOOP
+			IF NEW.count_comments = badge.condition_value THEN
+			    INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge.id);
+			    EXIT;
+			END IF;
+
+		END LOOP;
+	END IF;
+	RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE TRIGGER listening_change
 AFTER INSERT OR UPDATE ON listen
 FOR EACH ROW
 EXECUTE FUNCTION listening_badge_check();
 
+CREATE OR REPLACE TRIGGER playlist_change
+AFTER INSERT OR UPDATE ON playlists
+FOR EACH ROW
+EXECUTE FUNCTION playlist_badge_check();
+
+CREATE OR REPLACE TRIGGER comments_change
+AFTER INSERT OR UPDATE ON comments
+FOR EACH ROW
+EXECUTE FUNCTION comments_badge_check();
+
 CREATE OR REPLACE TRIGGER registration_badge_check
 AFTER INSERT OR UPDATE ON login -- On ne sait pas encore comment on va faire le trigger de ça
 FOR EACH ROW
 EXECUTE FUNCTION registration_badge_check();
+
