@@ -12,19 +12,27 @@ AS
 	INNER JOIN episodes_ranking ON episodes_ranking.podcast_id = podcast_id
 	GROUP BY podcast_id, p.id;
 
-CREATE OR REPLACE FUNCTION listening_badge_check
+
+CREATE OR REPLACE FUNCTION listening_badge_check()
 RETURNS TRIGGER AS
 $$
-BEGIN;
-IF NEW.listening_count IS NOT OLD.listening_count
-	FOR badge in (SELECT * FROM badges where type = 'ListeningCount')
-		LOOP
-		IF -- TODO: continue
+DECLARE
+    badge RECORD;
+BEGIN
+	IF NEW.listening_count IS DISTINCT FROM OLD.listening_count THEN
+	    -- ListeningCount est le type 0
+		FOR badge IN SELECT * FROM badges WHERE type = 0 LOOP
+			IF NEW.listening_count = badge.condition_value THEN
+			    INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge.id);
+			END IF;
 		END LOOP;
-END IF;
+	END IF;
+	RETURN NEW;
 END;
 $$
-LANGUAGE PLPGSQL
+LANGUAGE plpgsql;
+
+
 
 CREATE OR REPLACE TRIGGER listening_change
 AFTER INSERT OR UPDATE ON listen
