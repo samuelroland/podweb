@@ -55,16 +55,16 @@ Nous allons développer un système de *badges* attribués aux utilisateurs quan
 
 | Type             | Name                  | Points        | Condition            | Description                                                              |
 | ---------------- | --------------------- | ------------- | -------------------- | ------------------------------------------------------------------------ |
-| ListeningCount   |                       |               | 20                   |                                                                          |
-| ListeningCount   |                       |               | 50                   |                                                                          |
-|                  |                       |               |                      |                                                                          |
+| ListeningCount   | BabyListener          | 100 pts       | 50 listenings        |                                                                          |
+| ListeningCount   | BigBabyListener       | 400 pts       | 100 listenings       |                                                                          |
+| ListeningCount   | HeavyListener         | 10000 pts     | 1000 listenings      |                                                                          |
 | ListeningCount   | PetaListener          | 100000000 pts | 10000 listenings     | You are a peta listener, do you even have a life ?                       |
 | RegistrationDate | BabyCaster            | 100 pts       | 1 month passed       | You are not new as a month ago...                                        |
 | RegistrationDate | TeenCaster            | 300 pts       | 6 months passed      | Starting to rebel as a teen listening to podcasts instead of TV.         |
 | RegistrationDate | MatureCaster          | 1000 pts      | 1 year passed        |                                                                          |
 | RegistrationDate | SagedCaster           | 5000 pts      | 5 years passed       |                                                                          |
 | PlaylistCreation | PlaylistNewbie        | 40 pts        | created 1 playlist   | You find the best button !                                               |
-| PlaylistCreation | ?                     | ? pts         | ?                    | ??                                                                       |
+| PlaylistCreation | PlaylistBoss          | 200pts        | 10 playlist          |                                                                          |
 | CommentsCount    | CourageousCommentator | 10 pts        | posted 1 comment     | The first one is the hardest, congratulations !                          |
 | CommentsCount    | MatureCommentator     | 1000 pts      | posted 100 comments  | Almost full time commentator...                                          |
 | CommentsCount    | MatureCommentator     | 10000 pts     | posted 1000 comments | Podcasters will thank you but now you should give your fingers a break ! |
