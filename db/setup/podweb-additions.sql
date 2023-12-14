@@ -1,3 +1,4 @@
+-- Active: 1701610484662@@127.0.0.1@5432@postgres@public
 -- Project: Podweb
 -- Date: 03.12.2023
 
@@ -76,7 +77,7 @@ BEGIN
 	    -- Check si le badge existe déjà, au cas ou on enlève une playlist
         SELECT COUNT(*) INTO badge_exists FROM obtain WHERE user_id = NEW.user_id AND badge_id = NEW.badge_id;
         IF(badge_exists >= 1) THEN
-            EXIT;
+            RETURN NEW;
         END IF;
 	    -- PlaylistCreation est le type 2
 		FOR badge IN SELECT * FROM badges WHERE type = 2 LOOP
@@ -107,7 +108,7 @@ BEGIN
 	    -- Check si le badge existe déjà, au cas ou on enlève une playlist
         SELECT COUNT(*) INTO badge_exists FROM obtain WHERE user_id = NEW.user_id AND badge_id = NEW.badge_id;
         IF(badge_exists >= 1) THEN
-            EXIT;
+            RETURN NEW;
         END IF;
 	    -- CommentsCount est le type 3
 		FOR badge IN SELECT * FROM badges WHERE type = 3 LOOP
@@ -139,8 +140,8 @@ AFTER INSERT OR UPDATE ON comments
 FOR EACH ROW
 EXECUTE FUNCTION comments_badge_check();
 
-CREATE OR REPLACE TRIGGER registration_badge_check
-AFTER INSERT OR UPDATE ON login -- On ne sait pas encore comment on va faire le trigger de ça
-FOR EACH ROW
-EXECUTE FUNCTION registration_badge_check();
+-- CREATE OR REPLACE TRIGGER registration_badge_check
+-- AFTER INSERT OR UPDATE ON login -- On ne sait pas encore comment on va faire le trigger de ça
+-- FOR EACH ROW
+-- EXECUTE FUNCTION registration_badge_check();
 
