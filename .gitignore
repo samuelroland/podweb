@@ -25,3 +25,9 @@ replay_pid*
 MLD.mwb.bak
 
 *.json
+
+# IntelliJ
+.idea/
+
+# API Key
+APIKey.json
