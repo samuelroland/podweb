@@ -38,10 +38,18 @@ def str_sql_insert_generator(table, keys, list_dict_to_insert):
     return insert_str
 
 
-sql_insert_file_p = 'db/setup/podweb-podcasts-population.sql'
-sql_insert_file_e = 'db/setup/podweb-episodes-population.sql'
+sql_insert_file_p = 'db/setup/podweb-podcasts.sql'
+sql_insert_file_e = 'db/setup/podweb-episodes.sql'
+sql_insert_file_c = 'db/setup/podweb-categories.sql'
 
 json_podcasts = 'podcasts.json'
+
+keys_podcast = ['title', 'description', 'url', 'imageUrl', 'itunesAuthor', 'episodeCount']
+keys_episode = ['title', 'description', 'duration', 'datePublished', 'enclosureUrl']
+
+keys_insert_podcast = ['title', 'description', 'rss_feed', 'image', 'author', 'episodes_count', 'id']
+keys_insert_episode = ['title', 'description', 'duration', 'released_at', 'audio_url', 'podcast_id']
+keys_insert_category = ['id', 'name']
 
 print('\nRécupération des podcasts...\n\n')
 
@@ -52,11 +60,15 @@ except IOError:
     print('Aucun ficher nommé: ' + json_podcasts + 'trouvé!!\n\n')
     sys.exit(1)
 
-keys_podcast = ['title', 'description', 'url', 'imageUrl', 'itunesAuthor', 'episodeCount']
-keys_episode = ['title', 'description', 'duration', 'datePublished', 'enclosureUrl']
-
-keys_insert_podcast = ['title', 'description', 'rss_feed', 'image', 'author', 'episodes_count', 'id']
-keys_insert_episode = ['title', 'description', 'duration', 'released_at', 'audio_url', 'podcast_id']
+cat = []
+i = 0
+for podcast in data_p:
+    for cat_ind in range(1, 10):
+        cat_name = podcast['category' + str(cat_ind)]
+        temp = [di['name'] for di in cat]
+        if cat_name not in temp and cat_name:
+            cat.append({"id": i, "name": cat_name})
+            i += 1
 
 podcasts_data = select_keys_from_list_dict(data_p, keys_podcast)
 i = 0
@@ -96,3 +108,9 @@ with open(sql_insert_file_e, 'w+', encoding='utf-8') as f:
 
         f.write(str_sql_insert_generator('episodes', keys_insert_episode, episodes_data))
         i += 1
+
+with open(sql_insert_file_c, 'w+', encoding='utf-8') as f:
+    print('\nCréation des requêtes SQL d\'insertion des catégories')
+    f.write('SET search_path TO podweb;\n')
+    f.write('\n--INSERT CATEGORIES\n')
+    f.write(str_sql_insert_generator('categories', keys_insert_category, cat))
