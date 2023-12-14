@@ -67,7 +67,7 @@ Nous allons développer un système de *badges* attribués aux utilisateurs quan
 | PlaylistCreation | PlaylistBoss          | 200pts        | 10 playlist          |                                                                          |
 | CommentsCount    | CourageousCommentator | 10 pts        | posted 1 comment     | The first one is the hardest, congratulations !                          |
 | CommentsCount    | MatureCommentator     | 1000 pts      | posted 100 comments  | Almost full time commentator...                                          |
-| CommentsCount    | MatureCommentator     | 10000 pts     | posted 1000 comments | Podcasters will thank you but now you should give your fingers a break ! |
+| CommentsCount    | VeryMatureCommentator | 10000 pts     | posted 1000 comments | Podcasters will thank you but now you should give your fingers a break ! |
 
 Les 4 types suivants sont possibles:
 1. `ListeningCount`: le badge sera attribué à partir d'un certain **nombre d'écoutes d'épisodes** (2 écoutes du même épisode compte bien 2 fois)
