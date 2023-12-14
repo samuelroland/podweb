@@ -1,6 +1,7 @@
--- Active: 1701610484662@@127.0.0.1@5432@postgres@public
 -- Project: Podweb
 -- Date: 03.12.2023
+
+set search_path = podweb;
 
 CREATE OR REPLACE VIEW episodes_ranking
 AS
