@@ -13,34 +13,40 @@ def str_sql_insert_generator(table, keys, list_dict_to_insert):
     insert_str = 'INSERT INTO ' + table + '('
 
     for k in keys:
-            str_key = k.replace('\'', '\'\'').replace('\n', '\\n')
+            str_key = k
             insert_str += str_key
             if k != keys[-1]:
                 insert_str += ', '
     
     insert_str += ') VALUES'
 
+    l = 0
     for dict_to_insert in list_dict_to_insert:
         values = list(dict_to_insert.values())
 
         insert_str += '('
 
+        k = 0
         for v in values:
             str_val = str(v).replace('\'', ' ').replace('\n', '\\n')
             insert_str += '\'' + str_val + '\''
-            if v != values[-1]:
+            if k != len(values) - 1:
                 insert_str += ', '
-        if dict_to_insert != list_dict_to_insert[-1]:
+            k += 1
+        
+        if l != len(list_dict_to_insert) - 1:
             insert_str += '), \n'
         else:
             insert_str += ');\n'
-        
+        l += 1
+
     return insert_str
 
 
 sql_insert_file_p = 'db/setup/podweb-podcasts.sql'
 sql_insert_file_e = 'db/setup/podweb-episodes.sql'
 sql_insert_file_c = 'db/setup/podweb-categories.sql'
+sql_insert_file_cz = 'db/setup/podweb-categorize.sql'
 
 json_podcasts = 'podcasts.json'
 
@@ -50,6 +56,7 @@ keys_episode = ['title', 'description', 'duration', 'datePublished', 'enclosureU
 keys_insert_podcast = ['title', 'description', 'rss_feed', 'image', 'author', 'episodes_count', 'id']
 keys_insert_episode = ['title', 'description', 'duration', 'released_at', 'audio_url', 'podcast_id']
 keys_insert_category = ['id', 'name']
+keys_insert_categorize = ['podcast_id', 'category_id']
 
 print('\nRécupération des podcasts...\n\n')
 
@@ -72,7 +79,14 @@ for podcast in data_p:
 
 podcasts_data = select_keys_from_list_dict(data_p, keys_podcast)
 i = 0
+categorize = []
 for podcast in podcasts_data:
+    for cat_ind in range(1, 10):
+        cat_name = data_p[i]['category' + str(cat_ind)]
+        for cat_comp in cat:
+            if cat_comp['name'] == cat_name:
+                categorize.append({"podcast_id": i, "category_id": cat_comp['id']})
+                break
     podcast['id'] = i
     i += 1
 
@@ -114,3 +128,9 @@ with open(sql_insert_file_c, 'w+', encoding='utf-8') as f:
     f.write('SET search_path TO podweb;\n')
     f.write('\n--INSERT CATEGORIES\n')
     f.write(str_sql_insert_generator('categories', keys_insert_category, cat))
+
+with open(sql_insert_file_cz, 'w+', encoding='utf-8') as f:
+    print('\nCréation des requêtes SQL d\'insertion de "categorize"')
+    f.write('SET search_path TO podweb;\n')
+    f.write('\n--INSERT CATEGORIZE\n')
+    f.write(str_sql_insert_generator('categorize', keys_insert_categorize, categorize))
