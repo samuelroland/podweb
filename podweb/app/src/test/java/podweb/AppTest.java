@@ -3,12 +3,35 @@
  */
 package podweb;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import io.javalin.Javalin;
+import io.javalin.testtools.JavalinTest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class AppTest {
-    @Test void appHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull(classUnderTest.getGreeting(), "app should have a greeting");
-    }
+public class AppTest {
+
+	static Javalin app = App.setupApp();
+
+	@BeforeAll
+	public static void setup() {
+		app.start();
+	}
+
+	@AfterAll
+	public static void tearDown() {
+		app.stop();
+	}
+
+	@Test
+	public void home_page_returns_welcome_message() {
+		JavalinTest.test(app, (server, client) -> {
+			var res = client.get("/");
+			assertEquals(200, res.code());
+			assertEquals("Welcome on Podweb", res.body().string());
+		});
+	}
+
 }

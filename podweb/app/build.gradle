@@ -20,9 +20,16 @@ dependencies {
     testImplementation libs.junit.jupiter
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // This dependency is used by the application.
+	
+	testImplementation(platform('org.junit:junit-bom:5.10.1'))
+	testImplementation('org.junit.jupiter:junit-jupiter')
+    
+	// This dependency is used by the application.
     implementation libs.guava
+
+	implementation("io.javalin:javalin:5.6.3")
+
+	testImplementation("io.javalin:javalin-bundle:5.6.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -40,4 +47,12 @@ application {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+// Change logging settings for tests
+test {
+	testLogging {
+		events "failed"
+		exceptionFormat "full"
+	}
 }

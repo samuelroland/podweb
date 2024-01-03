@@ -3,12 +3,22 @@
  */
 package podweb;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import io.javalin.Javalin;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
-    }
+public class App {
+	static final int PORT = 7000;
+	static Javalin app;
+
+	public static void main(String[] args) {
+		System.out.println("Podweb server has started...");
+		// app = setupApp().start(PORT);
+	}
+
+	// Separated method to easily test the server
+	public static Javalin setupApp() {
+		Javalin app = Javalin.create();
+		// TODO: Defines routes
+		app.get("/", ctx -> ctx.result("asdfsd"));
+		return app;
+	}
 }
