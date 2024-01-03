@@ -2,3 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
+.podcast {
+	@apply border-2 border-pink-500 m-3
+}
