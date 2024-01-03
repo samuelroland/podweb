@@ -3,7 +3,13 @@
  */
 package podweb;
 
+import java.nio.file.Path;
+
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.DirectoryCodeResolver;
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
 
 public class App {
 	static final int PORT = 7000;
@@ -16,9 +22,25 @@ public class App {
 
 	// Separated method to easily test the server
 	public static Javalin setupApp() {
+		JavalinJte.init(createTemplateEngine());
 		Javalin app = Javalin.create();
+
 		// TODO: Defines routes
 		app.get("/", ctx -> ctx.render("layout.jte"));
 		return app;
+	}
+
+	// Configuration of JTE templates
+	// Taken from the Javalin tutorials:
+	// https://javalin.io/tutorials/jte#precompiling-templates
+	private static TemplateEngine createTemplateEngine() {
+		if (System.getenv("PODWEB_PRODUCTION") != null) {
+			// Production mode, use precompiled classes loaded in the JAR
+			return TemplateEngine.createPrecompiled(Path.of("jte-classes"), ContentType.Html);
+		} else {
+			// Dev mode, compile on the fly templates in the default folder src/main/jte
+			DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "main", "jte"));
+			return TemplateEngine.create(codeResolver, ContentType.Html);
+		}
 	}
 }

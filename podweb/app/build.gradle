@@ -8,6 +8,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+	id "gg.jte.gradle" version "3.1.6" // From https://jte.gg/pre-compiling/#gradle
 }
 
 repositories {
@@ -19,21 +20,23 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
 
+	//Some packages for Junit 3 parts
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	
 	testImplementation(platform('org.junit:junit-bom:5.10.1'))
 	testImplementation('org.junit.jupiter:junit-jupiter')
     
 	// This dependency is used by the application.
     implementation libs.guava
 
+	//Javalin basic and advanced package to have testing tools
 	implementation("io.javalin:javalin:5.6.3")
-
 	testImplementation("io.javalin:javalin-bundle:5.6.3")
 
+	//JTE setup
 	implementation("io.javalin:javalin-rendering:5.6.3")
 	implementation("gg.jte:jte:3.1.6")
 
+	//Javalin proposed logger (in console)
 	implementation("org.slf4j:slf4j-simple:2.0.7")
 }
 
@@ -42,6 +45,39 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+// From the Gradle docs
+// https://docs.gradle.org/current/userguide/working_with_files.html#sec:creating_uber_jar_example
+tasks.register('uberJar', Jar) {
+    archiveClassifier = 'uber'
+
+	//Added to fix error 'Entry META-INF/LICENSE is a duplicate but no duplicate handling strategy has been set'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+	//Added to fix error of main class not found when running with java -jar
+	manifest {
+        attributes["Main-Class"] = "podweb.App"
+    }
+}
+
+tasks.uberJar {
+    dependsOn(tasks.precompileJte)
+    from(fileTree("jte-classes") {
+        include("**/*.class")
+        include("**/*.bin") // Only required if you use binary templates
+    })
+}
+
+// From https://jte.gg/pre-compiling/#gradle
+jte {
+    precompile()
 }
 
 application {
@@ -54,7 +90,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// Change logging settings for tests
+// Change logging settings for full details of tests failures
 test {
 	testLogging {
 		events "failed"
