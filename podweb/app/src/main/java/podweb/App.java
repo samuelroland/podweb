@@ -11,14 +11,14 @@ public class App {
 
 	public static void main(String[] args) {
 		System.out.println("Podweb server has started...");
-		// app = setupApp().start(PORT);
+		app = setupApp().start(PORT);
 	}
 
 	// Separated method to easily test the server
 	public static Javalin setupApp() {
 		Javalin app = Javalin.create();
 		// TODO: Defines routes
-		app.get("/", ctx -> ctx.result("asdfsd"));
+		app.get("/", ctx -> ctx.render("layout.jte"));
 		return app;
 	}
 }
