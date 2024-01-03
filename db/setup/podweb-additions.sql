@@ -5,14 +5,16 @@ set search_path = podweb;
 
 CREATE OR REPLACE VIEW episodes_ranking
 AS
-	SELECT id, title, duration, podcast_id, sum(listening_count) as count from episodes
+	SELECT id, title, duration, podcast_id, sum(listening_count) as listenings_sum from episodes
 	INNER JOIN listen ON id = episode_id
-	GROUP BY user_id, id;
+	GROUP BY id
+	ORDER BY listenings_sum DESC;
 CREATE OR REPLACE VIEW podcasts_ranking
 AS
-	SELECT p.id, p.title, p.image, p.author, sum(count) as count from podcasts p
+	SELECT p.id, p.title, p.image, p.author, sum(listenings_sum) as listenings_total from podcasts p
 	INNER JOIN episodes_ranking ON episodes_ranking.podcast_id = podcast_id
-	GROUP BY podcast_id, p.id;
+	GROUP BY p.id
+	ORDER BY listenings_total DESC;
 
 
 CREATE OR REPLACE FUNCTION listening_badge_check()
