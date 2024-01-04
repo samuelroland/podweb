@@ -4,12 +4,17 @@
 package podweb;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
+import podweb.models.*;
+import podweb.controllers.*;
 
 public class App {
 	static final int PORT = 7000;
@@ -23,10 +28,14 @@ public class App {
 	// Separated method to easily test the server
 	public static Javalin setupApp() {
 		JavalinJte.init(createTemplateEngine());
-		Javalin app = Javalin.create();
+
+		Javalin app = Javalin.create(config -> {
+			config.staticFiles.add("src/main/static", Location.EXTERNAL);
+		});
 
 		// TODO: Defines routes
-		app.get("/", ctx -> ctx.render("layout.jte"));
+		PodcastsController podcastsController = new PodcastsController();
+		app.get("/", podcastsController::index);
 		return app;
 	}
 
