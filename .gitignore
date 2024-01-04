@@ -32,7 +32,5 @@ MLD.mwb.bak
 # API Key
 APIKey.json
 *.sql
-podweb/node_modules
-podweb/app/src/main/jte/out.css
-podweb/app
+out.css
 jte-classes
