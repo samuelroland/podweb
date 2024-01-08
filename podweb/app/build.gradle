@@ -9,14 +9,6 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
 	id "gg.jte.gradle" version "3.1.6" // From https://jte.gg/pre-compiling/#gradle
-    id "au.id.wale.tailwind" version "0.2.0" // From https://github.com/wale/gradle-tailwind
-}
-
-tailwind {
-    version = "3.4.0"
-    configPath = "src/main/static"
-    input = "src/main/static/style.css"
-    output = "src/main/static/out.css"
 }
 
 repositories {
@@ -78,14 +70,7 @@ tasks.register('uberJar', Jar) {
     }
 }
 
-// Just a way to make tailwind CLI to be downloaded and run at server start (to avoid running the tailwind-watch.sh)
-tasks.run {
-	// dependsOn(tasks.tailwindDownload, tasks.tailwindCompile)
-}
-
 tasks.uberJar {
-	// Added tailwind compilation tasks, so production server has the latest compiled CSS (not minified though)
-    dependsOn(tasks.precompileJte, tasks.tailwindDownload, tasks.tailwindCompile)
     from(fileTree("jte-classes") {
         include("**/*.class")
         include("**/*.bin") // Only required if you use binary templates
