@@ -24,7 +24,13 @@ Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` 
     ```sh
     git clone https://github.com/samuelroland/podweb
     ```
-1. Pour builder le style une première fois
+1. Pour installer tailwindcss via NPM
+    ```sh
+    npm install
+    # ou en plus court
+    npm i
+    ```
+1. Pour charger le style une première fois
     ```sh
     npm run prod
     ```
