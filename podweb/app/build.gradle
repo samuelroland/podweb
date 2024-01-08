@@ -103,6 +103,7 @@ test {
 // Clear the output before tests run
 // Very useful in gradle test --continuous 
 // From https://discuss.gradle.org/t/possibility-to-clear-screen-before-continous-build-output/24488/3
+// This will fail on Windows, change "clear" to "cls" !
 gradle.addListener new BuildAdapter() {
     void projectsEvaluated(Gradle gradle) {
         exec { commandLine 'clear' }
