@@ -36,6 +36,8 @@ public class App {
 		// TODO: Defines routes
 		PodcastsController podcastsController = new PodcastsController();
 		app.get("/", podcastsController::index);
+		app.get("/podcasts/{id}", podcastsController::detailPodcast);
+		//app.get("/search?q={keyword}", podcastsController::search);
 		return app;
 	}
 

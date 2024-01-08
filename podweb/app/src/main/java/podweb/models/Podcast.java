@@ -44,10 +44,39 @@ public class Podcast {
 	}
 
 	public boolean exists(int id) {
-		String query = "select top 1 from podcasts where id = :id";
+		String query = "select top 1 from podcasts where id = " + id + ";";
 		TreeMap<Integer, Object> params = new TreeMap<>();
 		params.put(1, 2);
 
 		return Query.query(query, new Object[] { id }) == null;
 	}
+
+	public static Podcast getPodcast(int id) {
+		String query = "select * from podcasts where id = " + id + ";";
+		ResultSet set = Query.query(query);
+		Podcast p = new Podcast();
+		if (set == null) {
+			System.out.println("Set is null");
+			return p;
+		}
+		try {
+			set.next();
+			System.out.println("Found elements !");
+			p.id = set.getInt("id");
+			p.title = set.getString("title");
+			p.description = set.getString("description");
+			p.rss_feed = set.getString("rss_feed");
+			p.image = set.getString("image");
+			p.author = set.getString("author");
+			p.episodes_count = set.getInt("episodes_count");
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return p;
+	}
+
+
 }

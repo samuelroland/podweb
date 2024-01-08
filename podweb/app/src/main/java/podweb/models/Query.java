@@ -13,8 +13,8 @@ public class Query {
 	static private void setup() throws SQLException {
 		// Establish a connection to the database
 		String url = "jdbc:postgresql://localhost:5432/?options=-c%20search_path=podweb%20";
-		String username = "postgres";
-		String password = "postgres";
+		String username = "bdr";
+		String password = "bdr";
 		connection = DriverManager.getConnection(url, username, password);
 	}
 
@@ -52,4 +52,5 @@ public class Query {
 		}
 		return false;
 	}
+
 }
