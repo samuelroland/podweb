@@ -14,7 +14,7 @@ Voici les outils que nous utilisons pour implémenter noter application web en J
 
 ### Prérequis
 1. JDK 21
-1. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS)
+1. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas mais peuvent être reprise du `package.json`.
 1. [Gradle](https://gradle.org/install/) (optionnel mais recommandé)
 
 ### Mise en place
@@ -36,10 +36,12 @@ Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` 
 1. Ouvrir son navigateur en `localhost:7000`
 
 Autres commandes utiles:
+
 Pour builder le projet:
 ```sh
 gradle build
 ```
+
 Pour lancer le serveur (cette commande fait également le build)
 ```sh
 gradle run
@@ -64,6 +66,8 @@ Pour que les nouvelles classes Tailwind soient bien ajoutés à la volée dès q
 ```sh
 npm run watch
 ```
+
+Nous utilisons NPM pour facilement installer le tailwindcss et le mettre à jour si besoin. NPM utilise un fichier `package.json` définissant la dépendance `tailwindcss > 3.3.1` et 2 scripts `watch` et `prod` documentés dans ce document.
 
 Note: des extensions d'IDE pour supporter la syntaxe JTE existe pour [IntelliJ](https://plugins.jetbrains.com/plugin/14521-jte/) et [VSCode](https://marketplace.visualstudio.com/items?itemName=maj2c.jte-template-syntax-highlight). Très pratique pour avoir des couleurs utiles et avoir de l'autocomplétion HTML et CSS, tout en ayant les couleurs et propositions liées à Java.
 
