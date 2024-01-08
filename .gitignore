@@ -34,3 +34,5 @@ APIKey.json
 *.sql
 out.css
 jte-classes
+basic
+podweb/node_modules

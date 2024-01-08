@@ -1,0 +1,15 @@
+{
+    "name": "basetw",
+    "version": "1.0.0",
+    "description": "",
+    "main": "tailwind.config.js",
+    "scripts": {
+        "watch": "tailwindcss -c ./app/src/main/static/tailwind.config.js -i ./app/src/main/static/style.css -o ./app/src/main/static/out.css --watch",
+        "prod": "tailwindcss -c ./app/src/main/static/tailwind.config.js -i ./app/src/main/static/style.css -o ./app/src/main/static/out.css --minify"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "tailwindcss": "^3.4.1"
+    }
+}
