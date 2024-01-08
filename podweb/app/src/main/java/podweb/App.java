@@ -29,6 +29,16 @@ public class App {
     public static Javalin setupApp() {
         JavalinJte.init(createTemplateEngine());
 
+        // Search static files inside the default folder in dev and just a "static"
+        // folder in production
+        Javalin app = Javalin.create(config -> {
+            String folder = "src/main/static";
+            if (System.getenv("PODWEB_PRODUCTION") != null) {
+                folder = "static";
+            }
+            config.staticFiles.add(folder, Location.EXTERNAL);
+        });
+
         // TODO: Defines routes
         PodcastsController podcastsController = new PodcastsController();
         app.get("/", podcastsController::index);
