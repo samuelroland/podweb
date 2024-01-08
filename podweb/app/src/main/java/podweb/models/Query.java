@@ -8,49 +8,53 @@ import java.sql.SQLException;
 import java.util.TreeMap;
 
 public class Query {
-	private static Connection connection;
+    private static Connection connection;
 
-	static private void setup() throws SQLException {
-		// Establish a connection to the database
-		String url = "jdbc:postgresql://localhost:5432/?options=-c%20search_path=podweb%20";
-		String username = "bdr";
-		String password = "bdr";
-		connection = DriverManager.getConnection(url, username, password);
-	}
+    // static private Config config() {
 
-	// TODO: add try with resources
-	public static ResultSet query(String query) {
-		try {
-			setup();
-			PreparedStatement statement = connection.prepareStatement(query);
-			return statement.executeQuery();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return null;
-	}
+    // }
 
-	public static ResultSet query(String query, Object[] params) {
-		try {
-			setup();
-			PreparedStatement statement = connection.prepareStatement(query);
-			return statement.executeQuery();
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return null;
-	}
+    static private void setup() throws SQLException {
+        // Establish a connection to the database
+        String url = "jdbc:postgresql://localhost:5432/?options=-c%20search_path=podweb%20";
+        String username = "bdr";
+        String password = "bdr";
+        connection = DriverManager.getConnection(url, username, password);
+    }
 
-	public static boolean update(String query, Object[] params) {
-		try {
-			setup();
-			PreparedStatement statement = connection.prepareStatement(query);
-			statement.executeUpdate();
-			return true;// operation success
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return false;
-	}
+    // TODO: add try with resources
+    public static ResultSet query(String query) {
+        try {
+            setup();
+            PreparedStatement statement = connection.prepareStatement(query);
+            return statement.executeQuery();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    public static ResultSet query(String query, Object[] params) {
+        try {
+            setup();
+            PreparedStatement statement = connection.prepareStatement(query);
+            return statement.executeQuery();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
+    }
+
+    public static boolean update(String query, Object[] params) {
+        try {
+            setup();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate();
+            return true;// operation success
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return false;
+    }
 
 }

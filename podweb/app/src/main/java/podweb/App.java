@@ -17,41 +17,37 @@ import podweb.models.*;
 import podweb.controllers.*;
 
 public class App {
-	static final int PORT = 7000;
-	static Javalin app;
+    static final int PORT = 7000;
+    static Javalin app;
 
-	public static void main(String[] args) {
-		System.out.println("Podweb server has started...");
-		app = setupApp().start(PORT);
-	}
+    public static void main(String[] args) {
+        System.out.println("Podweb server has started...");
+        app = setupApp().start(PORT);
+    }
 
-	// Separated method to easily test the server
-	public static Javalin setupApp() {
-		JavalinJte.init(createTemplateEngine());
+    // Separated method to easily test the server
+    public static Javalin setupApp() {
+        JavalinJte.init(createTemplateEngine());
 
-		Javalin app = Javalin.create(config -> {
-			config.staticFiles.add("src/main/static", Location.EXTERNAL);
-		});
+        // TODO: Defines routes
+        PodcastsController podcastsController = new PodcastsController();
+        app.get("/", podcastsController::index);
+        app.get("/podcasts/{id}", podcastsController::detailPodcast);
+        // app.get("/search?q={keyword}", podcastsController::search);
+        return app;
+    }
 
-		// TODO: Defines routes
-		PodcastsController podcastsController = new PodcastsController();
-		app.get("/", podcastsController::index);
-		app.get("/podcasts/{id}", podcastsController::detailPodcast);
-		//app.get("/search?q={keyword}", podcastsController::search);
-		return app;
-	}
-
-	// Configuration of JTE templates
-	// Taken from the Javalin tutorials:
-	// https://javalin.io/tutorials/jte#precompiling-templates
-	private static TemplateEngine createTemplateEngine() {
-		if (System.getenv("PODWEB_PRODUCTION") != null) {
-			// Production mode, use precompiled classes loaded in the JAR
-			return TemplateEngine.createPrecompiled(Path.of("jte-classes"), ContentType.Html);
-		} else {
-			// Dev mode, compile on the fly templates in the default folder src/main/jte
-			DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "main", "jte"));
-			return TemplateEngine.create(codeResolver, ContentType.Html);
-		}
-	}
+    // Configuration of JTE templates
+    // Taken from the Javalin tutorials:
+    // https://javalin.io/tutorials/jte#precompiling-templates
+    private static TemplateEngine createTemplateEngine() {
+        if (System.getenv("PODWEB_PRODUCTION") != null) {
+            // Production mode, use precompiled classes loaded in the JAR
+            return TemplateEngine.createPrecompiled(Path.of("jte-classes"), ContentType.Html);
+        } else {
+            // Dev mode, compile on the fly templates in the default folder src/main/jte
+            DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "main", "jte"));
+            return TemplateEngine.create(codeResolver, ContentType.Html);
+        }
+    }
 }

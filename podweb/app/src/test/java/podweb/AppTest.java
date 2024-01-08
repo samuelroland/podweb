@@ -13,25 +13,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AppTest {
 
-	static Javalin app = App.setupApp();
+    static Javalin app = App.setupApp();
 
-	@BeforeAll
-	public static void setup() {
-		app.start();
-	}
-
-	@AfterAll
-	public static void tearDown() {
-		app.stop();
-	}
-
-	@Test
-	public void home_page_returns_welcome_message() {
-		JavalinTest.test(app, (server, client) -> {
-			var res = client.get("/");
-			assertEquals(200, res.code());
-			assertEquals("Welcome on Podweb", res.body().string());
-		});
-	}
+    @Test
+    public void home_page_returns_welcome_message() {
+        JavalinTest.test(app, (server, client) -> {
+            var res = client.get("/");
+            assertEquals(200, res.code());
+            assertEquals("Welcome on Podweb", res.body().string());
+        });
+    }
 
 }
