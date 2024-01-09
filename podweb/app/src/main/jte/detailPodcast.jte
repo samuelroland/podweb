@@ -26,6 +26,8 @@
         </div>
 
         <div class="flex flex-wrap">
+
+
             @for(Episode episode : episodes)
             <p class="font-bold line-clamp-1 mt-1 mb-2">${episode.title}</p>
             <div class="flex text-gray-600">
@@ -37,7 +39,6 @@
                 <source src="${episode.audio_url}" type="audio/mp3">
 
             </audio>
-
 
             @endfor
         </div>

@@ -34,6 +34,17 @@ public class Query {
         return null;
     }
 
+    public static PreparedStatement prepareStatement(String query) {
+        try {
+            setup();
+            PreparedStatement statement = connection.prepareStatement(query);
+            return statement;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
     public static ResultSet query(String query, Object[] params) {
         try {
             setup();

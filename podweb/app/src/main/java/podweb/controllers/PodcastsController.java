@@ -1,9 +1,11 @@
 package podweb.controllers;
 
 import podweb.models.Episode;
+import podweb.models.EpisodeSearch;
 import podweb.models.User;
 import podweb.models.Podcast;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -25,14 +27,20 @@ public class PodcastsController {
             ctx.render("detailPodcast.jte", Map.of("podcast", p, "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    // public void search(Context ctx) {
-    // String keyword = ctx.queryParam("keyword");
-    // ArrayList<Episode> e = Episode.search(keyword);
-    // ctx.render("resultSearch.jte", Map.of("episodes", e));
-    //
-    //
-    // }
+     public void search(Context ctx) {
+        try{
+            String keyword = ctx.queryParam("q");
+            ArrayList<EpisodeSearch> e = EpisodeSearch.search(keyword);
+            ctx.render("resultSearch.jte", Map.of("episodes", e));
+        } catch (NumberFormatException e) {
+            ctx.status(404);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+     }
 }
