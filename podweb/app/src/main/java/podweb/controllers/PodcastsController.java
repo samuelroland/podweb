@@ -1,8 +1,8 @@
 package podweb.controllers;
 
+import podweb.App;
 import podweb.models.Episode;
 import podweb.models.EpisodeSearch;
-import podweb.models.User;
 import podweb.models.Podcast;
 
 import java.sql.SQLException;
@@ -12,24 +12,18 @@ import java.util.Map;
 import io.javalin.http.Context;
 
 public class PodcastsController {
-    User fakeUser;
-    {
-        fakeUser = new User();
-        fakeUser.firstname = "John";
-        fakeUser.lastname = "Milan";
-    }
 
     public void index(Context ctx) {
         ArrayList<Podcast> podcasts = Podcast.all();
 
-        ctx.render("podcasts.jte", Map.of("loggedUser", fakeUser, "podcasts", podcasts));
+        ctx.render("podcasts.jte", Map.of("loggedUser", App.loggedUser(ctx), "podcasts", podcasts));
     }
 
     public void detailPodcast(Context ctx) {
         try {
             Podcast p = Podcast.find(Integer.parseInt(ctx.pathParam("id")));
             ArrayList<Episode> e = Episode.getByPodcast(p.id);
-            ctx.render("podcast.jte", Map.of("loggedUser", fakeUser, "podcast", p, "episodes", e));
+            ctx.render("podcast.jte", Map.of("loggedUser", App.loggedUser(ctx), "podcast", p, "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }

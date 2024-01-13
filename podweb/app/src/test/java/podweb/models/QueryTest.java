@@ -19,18 +19,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class QueryTest {
+    Javalin app = App.setupApp();
 
-    static Javalin app = App.setupApp();
     static Query<Podcast> q = new Query<>(Podcast.class);
 
     @BeforeEach
     public void setup() throws SQLException {
-        q.startTransaction();
+        Query.startTransaction();
     }
 
     @AfterEach
     public void finish() throws SQLException {
-        q.rollback();
+        Query.rollback();
     }
 
     @Test
@@ -60,7 +60,7 @@ public class QueryTest {
     @Test
     public void query_works_with_an_object() {
         Podcast p = new Podcast();
-        p.id = (int) Math.random() + 1000;
+        p.id = 100;
         p.title = "hey there";
         p.description = "some desc";
         p.rss_feed = "feed.rss";
