@@ -34,7 +34,13 @@ Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` 
     ```sh
     npm run prod
     ```
-1. TODO: configuration DB
+1. TODO: setup db podweb
+1. Pour configurer la base de données, il suffit de créer un fichier `.env` et d'indiquer les identifiants
+   ```env
+    DB_PORT=5432
+    DB_USER=
+    DB_PWD=
+   ```
 1. Pour lancer l'application directement (build + run)
     ```sh
     gradle run

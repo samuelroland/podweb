@@ -37,3 +37,4 @@ jte-classes
 basic
 podweb/node_modules
 podweb/.env
+podweb/app/bin

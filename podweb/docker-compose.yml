@@ -1,0 +1,35 @@
+version: '3.8'
+
+name: podweb-infra
+
+networks:
+  podweb-net:
+    driver: bridge
+
+services:
+  postgresql:
+    image: 'bitnami/postgresql:16'
+    container_name: podweb-postgresql
+    environment:
+      - POSTGRESQL_USERNAME=bdr
+      - POSTGRESQL_PASSWORD=bdr
+      - POSTGRESQL_DATABASE=bdr
+      - POSTGRESQL_POSTGRES_PASSWORD=root
+    ports:
+      - 5432:5432
+    volumes:
+      - .:/data:ro
+    networks:
+      - podweb-net
+  podweb:
+    build: .
+    environment:
+      # Loaded from .env
+      - DB_HOST=postgresql
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PWD=${DB_PWD}
+    networks:
+      - podweb-net
+    ports:
+      - 7000:7000
