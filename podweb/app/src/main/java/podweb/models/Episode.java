@@ -1,6 +1,6 @@
 package podweb.models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class Episode {
@@ -8,7 +8,7 @@ public class Episode {
     public String title;
     public String description;
     public int duration;
-    public Date released_at;
+    public Timestamp released_at;
     public String audio_url;
     public int podcast_id;
 
