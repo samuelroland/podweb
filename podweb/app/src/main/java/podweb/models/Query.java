@@ -45,6 +45,10 @@ public class Query<T> {
 
     public Query(Class<T> ref) {
         this.ref = ref;
+    }
+
+    // Static connection initialisation
+    {
         setup();
     }
 
@@ -67,6 +71,29 @@ public class Query<T> {
         startConnection();
     }
 
+    void startTransaction() throws SQLException {
+        connection.setAutoCommit(false);
+    }
+
+    void commit() throws SQLException {
+        connection.commit();
+    }
+
+    void rollback() throws SQLException {
+        connection.rollback();
+    }
+
+    public static int count(String table) {
+        try {
+            ResultSet set = rawQuery("select count(*) as count from " + table);
+            set.next();
+            return set.getInt("count");
+        } catch (SQLException e) {
+            System.out.println("Query.count() error: " + e);
+        }
+        return -1;
+    }
+
     // TODO: add try with resources
     public ArrayList<T> query(String query) {
         return query(query, null);
@@ -83,6 +110,16 @@ public class Query<T> {
                 applyParamsOnStatement(statement, list);
             ResultSet result = statement.executeQuery();
             return resultToObjects(result);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    static private ResultSet rawQuery(String query) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            return statement.executeQuery();
         } catch (Exception e) {
             System.out.println(e);
         }
