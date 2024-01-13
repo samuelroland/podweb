@@ -1,7 +1,6 @@
 package podweb.models;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class Podcast {
     public int id;
@@ -26,8 +25,8 @@ public class Podcast {
         return null;
     }
 
-    public boolean exists(int id) {
-        return q.query("select top 1 from podcasts where id = " + id, new Object[] { id }) == null;
+    public static boolean exists(int id) {
+        return q.query("select top 1 from podcasts where id = ?", new Object[] { id }) == null;
     }
 
     public String toString() {
