@@ -7,17 +7,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
-
 import io.javalin.Javalin;
-import io.javalin.json.JavalinJackson;
 import io.javalin.testtools.JavalinTest;
-import podweb.models.Podcast;
 import podweb.models.Query;
 
 import static org.assertj.core.api.Assertions.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
 
@@ -70,6 +67,24 @@ public class AuthTest {
             String page2 = res2.body().string();
             assertThat(page2).contains("<h1>Login");
             assertThat(page2).contains("Login error");
+        });
+    }
+
+    @Test
+    public void logout_feature_exists() {
+        JavalinTest.test(app, (server, client) -> {
+            // Login
+            AppTest.actingAs(1);
+            var res = client.get("/");
+            assertThat(res.body().string()).contains("Eulalia");
+
+            // and logout
+            var res2 = client.get("/logout");
+            assertEquals(200, res.code());
+            String page = res2.body().string();
+            assertThat(page).contains("<h1>Podcasts");
+            assertThat(page).doesNotContain("Eulalia");
+            assertThat(page).doesNotContain("Logout");
         });
     }
 }

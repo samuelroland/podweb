@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
 import podweb.models.Podcast;
+import podweb.models.User;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -28,5 +29,28 @@ public class AppTest {
                 assertThat(page).contains(String.valueOf(podcast.episodes_count));
             }
         });
+    }
+
+    @Test
+    public void home_page_shows_logged_user_name_when_logged() {
+        JavalinTest.test(app, (server, client) -> {
+            // It makes sure we can login programmatically
+            AppTest.actingAs(1);
+            assertEquals(1, ((User) App.loggedUser(null)).id);
+
+            // Do a request on behalf of Eulalia
+            var res = client.get("/");
+            assertEquals(200, res.code());
+            String page = res.body().string();
+            assertThat(page).contains("Eulalia");
+            assertThat(page).contains("<button>Logout");
+            assertThat(page).doesNotContain("Login");
+        });
+    }
+
+    // In testing, make the requests act as the user with the given id
+    // It makes App.loggedUser() return this user instead of looking in ctx
+    public static void actingAs(int id) {
+        App.testingLoggedUser = User.find(id);
     }
 }

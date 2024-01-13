@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class User {
+    public Integer id;
     public String firstname;
     public String lastname;
     public String email;

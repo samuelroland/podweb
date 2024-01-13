@@ -3,6 +3,7 @@ package podweb.controllers;
 import java.util.Map;
 
 import io.javalin.http.Context;
+import podweb.App;
 import podweb.models.User;
 
 public class UsersController {
@@ -24,7 +25,6 @@ public class UsersController {
 
         if (validPwd) {
             ctx.sessionAttribute("user", user);
-            // ctx.cookie("logged_user_id", "1");
             ctx.redirect("/");
         } else {
             renderLoginPage(ctx, true);
@@ -33,5 +33,11 @@ public class UsersController {
 
     private void renderLoginPage(Context ctx, boolean error) {
         ctx.render("login.jte", Map.of("error", error));
+    }
+
+    public void logout(Context ctx) {
+        App.testingLoggedUser = null;
+        ctx.req().getSession().invalidate();
+        ctx.redirect("/");
     }
 }

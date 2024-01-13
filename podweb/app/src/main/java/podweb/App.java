@@ -18,13 +18,14 @@ import podweb.models.User;
 public class App {
     static final int PORT = 7000;
     static Javalin server;
+    public static Object testingLoggedUser = null; // the logged user in testing
 
     public static void main(String[] args) {
         System.out.println("Podweb server has started...");
         server = setupApp().start(PORT);
 
         server.before(ctx -> {
-            if (!ctx.path().endsWith(".css"))
+            if (!ctx.path().endsWith(".css") && !ctx.path().endsWith(".ico"))
                 System.out.println("New " + ctx.method() + " request on " + ctx.path());
         });
     }
@@ -55,6 +56,7 @@ public class App {
         UsersController usersController = new UsersController();
         app.get("/login", usersController::loginPage);
         app.post("/login", usersController::login);
+        app.get("/logout", usersController::logout);
         return app;
     }
 
@@ -73,6 +75,11 @@ public class App {
     }
 
     public static Object loggedUser(Context ctx) {
+        // Hacky way to login as another user during testing
+        if (testingLoggedUser != null) {
+            return testingLoggedUser;
+        }
+
         Object possibleUser = ctx.req().getSession().getAttribute("user");
         if (possibleUser == null)
             return 1; // just not a user as Map.of doesn't support null values
