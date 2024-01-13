@@ -1,12 +1,13 @@
 @import podweb.models.User
 
-@param User user
+@param Object user
 
 <div>
-    @if(user != null)
-    <div class="text-xl">${user.firstname} ${user.lastname}</div>
+    @if(user instanceof User u)
+    <span class="text-xl mr-5">${u.firstname} ${u.lastname}</span>
+    <a href="/logout"><button>Logout</button></a>
     @else
     <div class="bg-red-200"></div>
-    <button>Login</button>
+    <a href="/login"><button>Login</button></a>
     @endif
 </div>

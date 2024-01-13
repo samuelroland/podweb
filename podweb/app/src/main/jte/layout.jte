@@ -3,7 +3,7 @@
 @import gg.jte.Content
 
 @param Content content
-@param User loggedUser = null
+@param Object loggedUser
 
 <!DOCTYPE html>
 <html lang="fr">

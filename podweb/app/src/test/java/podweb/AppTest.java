@@ -3,9 +3,6 @@
  */
 package podweb;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
@@ -17,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AppTest {
 
-    static Javalin app = App.setupApp();
+    Javalin app = App.setupApp();
 
     @Test
     public void home_page_shows_the_list_of_podcasts() {

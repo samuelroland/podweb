@@ -4,7 +4,7 @@
 @import java.util.ArrayList
 
 @param Podcast podcast
-@param User loggedUser = null
+@param Object loggedUser
 @param ArrayList<Episode> episodes
 
     @template.layout(
@@ -12,7 +12,7 @@
     @template.podcast-square(podcast, true)
 
     <h3 class="">Episodes</h3>
-    <div class="flex flex-wrap">
+    <div class="">
         @for(Episode episode : episodes)
         <div class=" my-3">
             <p class="font-bold line-clamp-2 my-2 text-2xl">${episode.title}</p>

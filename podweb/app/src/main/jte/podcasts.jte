@@ -2,7 +2,7 @@
 @import podweb.models.User
 @import java.util.ArrayList
 
-@param User loggedUser = null
+@param Object loggedUser
 @param ArrayList<Podcast> podcasts
 
     @template.layout(
