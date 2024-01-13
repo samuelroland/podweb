@@ -3,6 +3,7 @@ package podweb.models;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class Podcast {
@@ -14,33 +15,14 @@ public class Podcast {
     public String author;
     public int episodes_count;
 
-    public static ArrayList<Podcast> all() {
-        String query = "select * from podcasts;";
-        ResultSet set = Query.query(query);
-        ArrayList<Podcast> podcasts = new ArrayList<>();
-        if (set == null) {
-            System.out.println("Set is null");
-            return podcasts;
-        }
-        try {
-            System.out.println("Found elements !");
-            while (set.next()) {
-                var p = new Podcast();
-                p.id = set.getInt("id");
-                p.title = set.getString("title");
-                p.description = set.getString("description");
-                p.rss_feed = set.getString("rss_feed");
-                p.image = set.getString("image");
-                p.author = set.getString("author");
-                p.episodes_count = set.getInt("episodes_count");
-                podcasts.add(p);
-            }
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    private static Query<Podcast> q = new Query<>(Podcast.class);
 
-        return podcasts;
+    public static ArrayList<Podcast> all() {
+        return q.query("select * from podcasts;");
+    }
+
+    public static Podcast find(int id) {
+        return q.query("select * from podcasts where id = ?", Map.of("id", id)).getFirst();
     }
 
     public boolean exists(int id) {
@@ -48,34 +30,10 @@ public class Podcast {
         TreeMap<Integer, Object> params = new TreeMap<>();
         params.put(1, 2);
 
-        return Query.query(query, new Object[] { id }) == null;
+        return q.query(query, Map.of("id", id, "a", true, "dd", "asdf")) == null;
     }
 
-    public static Podcast getPodcast(int id) {
-        String query = "select * from podcasts where id = " + id + ";";
-        ResultSet set = Query.query(query);
-        Podcast p = new Podcast();
-        if (set == null) {
-            System.out.println("Set is null");
-            return p;
-        }
-        try {
-            set.next();
-            System.out.println("Found elements !");
-            p.id = set.getInt("id");
-            p.title = set.getString("title");
-            p.description = set.getString("description");
-            p.rss_feed = set.getString("rss_feed");
-            p.image = set.getString("image");
-            p.author = set.getString("author");
-            p.episodes_count = set.getInt("episodes_count");
-
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return p;
+    public String toString() {
+        return id + " " + title + " " + image;
     }
-
 }
