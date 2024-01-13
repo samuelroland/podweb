@@ -36,3 +36,4 @@ out.css
 jte-classes
 basic
 podweb/node_modules
+podweb/.env

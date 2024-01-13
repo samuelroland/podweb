@@ -8,21 +8,63 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Query<T> {
     Class<T> ref;
-    private static Connection connection;
+    private static Config config;
+    private static Connection connection = null;
+
+    record Config(String host, String port, String username, String password) {
+    }
+
+    static private void loadConfig() {
+        Map<String, String> env = System.getenv();
+        String host = "localhost";
+        if (env.containsKey("DB_HOST")) {
+            host = System.getenv("DB_HOST");
+        }
+
+        String port = "5432";
+        if (env.containsKey("DB_PORT")) {
+            port = System.getenv("DB_PORT");
+        }
+
+        String username = env.get("DB_USER");
+        if (!env.containsKey("DB_USER")) {
+            throw new RuntimeException("No env variable DB_USER found ..");
+        }
+
+        String password = env.get("DB_PWD");
+        if (!env.containsKey("DB_PWD")) {
+            throw new RuntimeException("No env variable DB_PWD found ..");
+        }
+
+        config = new Config(host, port, username, password);
+    }
 
     public Query(Class<T> ref) {
         this.ref = ref;
+        setup();
     }
 
-    static private void setup() throws SQLException {
+    static void startConnection() {
+        loadConfig();
+        String url = "jdbc:postgresql://" + config.host + ":" + config.port + "/?options=-c%20search_path=podweb%20";
+        try {
+            connection = DriverManager.getConnection(url, config.username, config.password);
+        } catch (SQLException e) {
+            System.out.println("Error on creating the connection: " + e);
+            System.out.println("Loaded configuration " + config);
+            System.exit(2);
+        }
+    }
+
+    static void setup() {
+        if (connection != null)
+            return;
         // Establish a connection to the database
-        String url = "jdbc:postgresql://localhost:5432/?options=-c%20search_path=podweb%20";
-        String username = "postgres";
-        String password = "postgres";
-        connection = DriverManager.getConnection(url, username, password);
+        startConnection();
     }
 
     // TODO: add try with resources
@@ -36,7 +78,6 @@ public class Query<T> {
 
     public ArrayList<T> query(String query, Object[] list) {
         try {
-            setup();
             PreparedStatement statement = connection.prepareStatement(query);
             if (list != null)
                 applyParamsOnStatement(statement, list);
@@ -54,7 +95,6 @@ public class Query<T> {
 
     public int update(String query, Object[] list) {
         try {
-            setup();
             PreparedStatement statement = connection.prepareStatement(query);
             if (list != null)
                 applyParamsOnStatement(statement, list);

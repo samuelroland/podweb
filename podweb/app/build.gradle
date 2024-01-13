@@ -113,3 +113,27 @@ gradle.addListener new BuildAdapter() {
         exec { commandLine 'clear' }
     }
 }
+
+
+// Load environement variable on gradle run from a .env file
+// From https://gist.github.com/silas/b2454f259ce600056d455e57351bdf68
+def static getenv(path = ".env") {
+    def env = [:]
+
+    def file = new File(path)
+    if (file.exists()) {
+        file.eachLine { line ->
+            line = line.trim()
+            if (line != "" && !line.startsWith("#")) {
+                def pair = line.split("=", 2)
+                env[pair[0].trim()] = pair.length == 2 ? pair[1].trim() : ""
+            }
+        }
+    }
+
+    return env
+}
+
+run {
+    getenv().each { name, value -> environment name, value }
+}
