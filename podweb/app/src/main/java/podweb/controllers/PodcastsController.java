@@ -12,11 +12,16 @@ import java.util.Map;
 import io.javalin.http.Context;
 
 public class PodcastsController {
-    public void index(Context ctx) {
-        ArrayList<Podcast> podcasts = Podcast.all();
-        User fakeUser = new User();
+    User fakeUser;
+    {
+        fakeUser = new User();
         fakeUser.firstname = "John";
         fakeUser.lastname = "Milan";
+    }
+
+    public void index(Context ctx) {
+        ArrayList<Podcast> podcasts = Podcast.all();
+
         ctx.render("podcasts.jte", Map.of("loggedUser", fakeUser, "podcasts", podcasts));
     }
 
@@ -24,7 +29,7 @@ public class PodcastsController {
         try {
             Podcast p = Podcast.find(Integer.parseInt(ctx.pathParam("id")));
             ArrayList<Episode> e = Episode.getByPodcast(p.id);
-            ctx.render("podcast.jte", Map.of("podcast", p, "episodes", e));
+            ctx.render("podcast.jte", Map.of("loggedUser", fakeUser, "podcast", p, "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }

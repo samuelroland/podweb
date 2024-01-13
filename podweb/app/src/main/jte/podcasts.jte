@@ -10,7 +10,7 @@
     <h1>Podcasts</h1>
     <div class="flex flex-wrap">
         @for(Podcast podcast : podcasts)
-        @template.podcast-square(podcast)
+        @template.podcast-square(podcast, false)
         @endfor
     </div>
     `,
