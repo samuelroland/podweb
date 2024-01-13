@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.javalin.Javalin;
-import podweb.App;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -19,8 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class QueryTest {
-    Javalin app = App.setupApp();
-
     static Query<Podcast> q = new Query<>(Podcast.class);
 
     @BeforeEach

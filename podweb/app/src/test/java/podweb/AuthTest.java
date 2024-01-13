@@ -37,17 +37,20 @@ public class AuthTest {
             var res = client.get("/login");
             assertEquals(200, res.code());
             String page = res.body().string();
-            assertThat(page).contains("<h1>Login");
-            assertThat(page).contains("<input");
-            assertThat(page).contains("Submit");
+            assertThat(page).contains("<h1>Login").contains("<input").contains("Submit");
         });
     }
 
     @Test
     public void login_post_works_on_valid_pwd_and_setup_session() {
         JavalinTest.test(app, (server, client) -> {
-            var res = client.post("/login", "email=stokes.ena@example.org&password=Eulalia");
+            var res = client.post("/login", "email=stokes.ena@example.org&password=pass");
             assertEquals(200, res.code());
+            String page = res.body().string();
+            assertThat(page).doesNotContain("Login error");
+            // cannot test further because redirection makes another request and loose
+            // cookies
+            // assertThat(page).contains("Eulalia");
         });
     }
 
