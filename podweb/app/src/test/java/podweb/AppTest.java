@@ -9,6 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
+import podweb.models.Podcast;
+
+import static org.assertj.core.api.Assertions.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AppTest {
@@ -16,12 +20,16 @@ public class AppTest {
     static Javalin app = App.setupApp();
 
     @Test
-    public void home_page_returns_welcome_message() {
+    public void home_page_shows_the_list_of_podcasts() {
         JavalinTest.test(app, (server, client) -> {
             var res = client.get("/");
             assertEquals(200, res.code());
-            assertEquals("Welcome on Podweb", res.body().string());
+            String page = res.body().string();
+            assertThat(page).contains("<h1>Podcasts");
+            for (Podcast podcast : Podcast.all()) {
+                assertThat(page).contains(podcast.title);
+                assertThat(page).contains(String.valueOf(podcast.episodes_count));
+            }
         });
     }
-
 }

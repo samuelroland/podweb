@@ -24,6 +24,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation(platform('org.junit:junit-bom:5.10.1'))
 	testImplementation('org.junit.jupiter:junit-jupiter')
+
+    //AssertJ
+    testImplementation('org.assertj:assertj-core:3.25.1')
     
 	// This dependency is used by the application.
     implementation libs.guava
@@ -34,13 +37,14 @@ dependencies {
 
 	//JTE setup
 	implementation("io.javalin:javalin-rendering:5.6.3")
-	implementation("gg.jte:jte:3.1.6")
+	implementation("gg.jte:jte:3.1.6") 
 
 	//Javalin proposed logger (in console)
 	implementation("org.slf4j:slf4j-simple:2.0.7")
 
 	//Database driver
 	implementation 'org.postgresql:postgresql:42.7.1'
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
