@@ -45,6 +45,8 @@ dependencies {
 	//Database driver
 	implementation 'org.postgresql:postgresql:42.7.1'
 
+    //To avoid Jackson error on ctx.formParam()
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
