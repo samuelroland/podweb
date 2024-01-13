@@ -1,10 +1,7 @@
 package podweb.models;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class Podcast {
     public int id;
@@ -22,15 +19,15 @@ public class Podcast {
     }
 
     public static Podcast find(int id) {
-        return q.query("select * from podcasts where id = ?", Map.of("id", id)).getFirst();
+        ArrayList<Podcast> list = q.query("select * from podcasts where id = ?", new Object[] { id });
+        if (list != null) {
+            return list.getFirst();
+        }
+        return null;
     }
 
     public boolean exists(int id) {
-        String query = "select top 1 from podcasts where id = " + id + ";";
-        TreeMap<Integer, Object> params = new TreeMap<>();
-        params.put(1, 2);
-
-        return q.query(query, Map.of("id", id, "a", true, "dd", "asdf")) == null;
+        return q.query("select top 1 from podcasts where id = " + id, new Object[] { id }) == null;
     }
 
     public String toString() {
