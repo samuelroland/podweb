@@ -4,25 +4,29 @@
 package podweb;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import io.javalin.Javalin;
+import io.javalin.http.Context;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
-import podweb.models.*;
 import podweb.controllers.*;
+import podweb.models.User;
 
 public class App {
     static final int PORT = 7000;
-    static Javalin app;
+    static Javalin server;
 
     public static void main(String[] args) {
         System.out.println("Podweb server has started...");
-        app = setupApp().start(PORT);
+        server = setupApp().start(PORT);
+
+        server.before(ctx -> {
+            if (!ctx.path().endsWith(".css"))
+                System.out.println("New " + ctx.method() + " request on " + ctx.path());
+        });
     }
 
     // Separated method to easily test the server
@@ -39,11 +43,18 @@ public class App {
             config.staticFiles.add(folder, Location.EXTERNAL);
         });
 
-        // TODO: Defines routes
+        // Defines routes
+
+        // Podcasts related routes
         PodcastsController podcastsController = new PodcastsController();
         app.get("/", podcastsController::index);
         app.get("/podcasts/{id}", podcastsController::detailPodcast);
         app.get("/search", podcastsController::search);
+
+        // Auth routes
+        UsersController usersController = new UsersController();
+        app.get("/login", usersController::loginPage);
+        app.post("/login", usersController::login);
         return app;
     }
 
@@ -59,5 +70,12 @@ public class App {
             DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "main", "jte"));
             return TemplateEngine.create(codeResolver, ContentType.Html);
         }
+    }
+
+    public static Object loggedUser(Context ctx) {
+        Object possibleUser = ctx.req().getSession().getAttribute("user");
+        if (possibleUser == null)
+            return 1; // just not a user as Map.of doesn't support null values
+        return (User) possibleUser;
     }
 }
