@@ -102,6 +102,8 @@ test {
 		events "failed"
 		exceptionFormat "full"
 	}
+    // Load env var from .env
+    getenv().each { name, value -> environment name, value }
 }
 
 // Clear the output before tests run
@@ -115,7 +117,7 @@ gradle.addListener new BuildAdapter() {
 }
 
 
-// Load environement variable on gradle run from a .env file
+// Load environement variable from a .env file (useful for run and test)
 // From https://gist.github.com/silas/b2454f259ce600056d455e57351bdf68
 def static getenv(path = ".env") {
     def env = [:]
@@ -135,5 +137,6 @@ def static getenv(path = ".env") {
 }
 
 run {
+    // Load env var from .env
     getenv().each { name, value -> environment name, value }
 }
