@@ -1,7 +1,5 @@
 package podweb.models;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -16,6 +14,8 @@ public class EpisodeSearch {
     public String podcast_title;
     public String podcast_description;
     public String podcast_author;
+
+    private static Query<EpisodeSearch> q = new Query<>(EpisodeSearch.class);
 
     public EpisodeSearch() {
     }
@@ -34,21 +34,6 @@ public class EpisodeSearch {
         this.podcast_author = podcast_author;
     }
 
-    private static EpisodeSearch setAssignement(ResultSet set) throws SQLException {
-        var e = new EpisodeSearch();
-        e.id = set.getInt("id");
-        e.title = set.getString("title");
-        e.description = set.getString("description");
-        e.duration = set.getInt("duration");
-        e.released_at = set.getString("released_at");
-        e.audio_url = set.getString("audio_url");
-        e.podcast_id = set.getInt("podcast_id");
-        e.podcast_title = set.getString("podcast_title");
-        e.podcast_description = set.getString("podcast_description");
-        e.podcast_author = set.getString("podcast_author");
-        return e;
-    }
-
     @Override
     public String toString() {
         return "EpisodeSearch [audio_url=" + audio_url + ", description=" + description + ", duration=" + duration
@@ -58,7 +43,7 @@ public class EpisodeSearch {
     }
 
     public static ArrayList<EpisodeSearch> search(String keyword) throws SQLException {
-        String query =  "SELECT " +
+        String query = "SELECT " +
                 "e.id AS id " +
                 ", e.title AS title " +
                 ", e.description AS description " +
@@ -78,29 +63,11 @@ public class EpisodeSearch {
                 "OR p.author LIKE ? " +
                 "LIMIT 10;";
 
-        System.out.println(keyword);
-        PreparedStatement preparedStatement = Query.prepareStatement(query);
-        assert preparedStatement != null;
-        for(int i = 1; i <= 5; i++) {
-            preparedStatement.setString(i, "%" + keyword + "%");
-        }
-        ResultSet set = preparedStatement.executeQuery();
-        ArrayList<EpisodeSearch> episodes = new ArrayList<>();
-
-        if (set == null) {
-            System.out.println("Set is null");
-            return episodes;
-        }
-        try {
-            System.out.println("Found elements !");
-            while (set.next()) {
-                episodes.add(setAssignement(set));
-            }
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        String[] texts = new String[5];
+        for (int i = 0; i < 5; i++) {
+            texts[i] = "%" + keyword + "%";
         }
 
-        return episodes;
+        return q.query(query, texts);
     }
 }

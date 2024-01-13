@@ -22,18 +22,16 @@ public class PodcastsController {
 
     public void detailPodcast(Context ctx) {
         try {
-            Podcast p = Podcast.getPodcast(Integer.parseInt(ctx.pathParam("id")));
-            ArrayList<Episode> e = Episode.getAllFromPodcast(p.id);
+            Podcast p = Podcast.find(Integer.parseInt(ctx.pathParam("id")));
+            ArrayList<Episode> e = Episode.getByPodcast(p.id);
             ctx.render("detailPodcast.jte", Map.of("podcast", p, "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
-     public void search(Context ctx) {
-        try{
+    public void search(Context ctx) {
+        try {
             String keyword = ctx.queryParam("q");
             ArrayList<EpisodeSearch> e = EpisodeSearch.search(keyword);
             ctx.render("resultSearch.jte", Map.of("episodes", e));
@@ -42,5 +40,5 @@ public class PodcastsController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-     }
+    }
 }
