@@ -24,7 +24,7 @@ public class AppTest {
             assertEquals(200, res.code());
             String page = res.body().string();
             assertThat(page).contains("<h1>Podcasts");
-            for (Podcast podcast : Podcast.all()) {
+            for (Podcast podcast : Podcast.o.all()) {
                 assertThat(page).contains(podcast.title);
                 assertThat(page).contains(String.valueOf(podcast.episodes_count));
             }
@@ -51,6 +51,6 @@ public class AppTest {
     // In testing, make the requests act as the user with the given id
     // It makes App.loggedUser() return this user instead of looking in ctx
     public static void actingAs(int id) {
-        App.testingLoggedUser = User.find(id);
+        App.testingLoggedUser = User.o.find(id);
     }
 }

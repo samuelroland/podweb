@@ -57,37 +57,36 @@ public class QueryTest {
     @Test
     public void query_works_with_an_object() {
         Podcast p = new Podcast();
-        p.id = 100;
         p.title = "hey there";
         p.description = "some desc";
         p.rss_feed = "feed.rss";
         p.image = "image.png";
         p.author = "me";
         p.episodes_count = 200;
-        assertEquals(35, Podcast.all().size());
+        assertEquals(35, Podcast.o.all().size());
 
         int nb = q.update(
-                "insert into podcasts (id, title, description, rss_feed, image, author, episodes_count) values (?,?,?,?,?,?,?);",
+                "insert into podcasts (title, description, rss_feed, image, author, episodes_count) values (?,?,?,?,?,?);",
                 p);
         assertNotEquals(-1, nb);
-        assertEquals(36, Podcast.all().size());
-        var foundP = Podcast.find(p.id);
+        assertEquals(36, Podcast.o.all().size());
+        var foundP = Podcast.o.find(p.id);
         assertNotNull(foundP);
     }
 
     @Test
     public void query_count_works() {
-        assertEquals(33, Queue.count());
+        assertEquals(33, Queue.o.count());
     }
 
     @Test
     public void tests_run_on_fresh_data() {
-        int countBefore = Queue.count();
+        int countBefore = Queue.o.count();
         assertEquals(33, countBefore);
         Queue queueItem = new Queue();
         queueItem.user_id = 2;
         queueItem.episode_id = 5;
         assertTrue(queueItem.create());
-        assertEquals(countBefore + 1, Queue.count());
+        assertEquals(countBefore + 1, Queue.o.count());
     }
 }

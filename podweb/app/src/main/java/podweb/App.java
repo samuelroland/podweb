@@ -3,6 +3,7 @@
  */
 package podweb;
 
+import java.io.File;
 import java.nio.file.Path;
 
 import gg.jte.ContentType;
@@ -11,7 +12,6 @@ import gg.jte.resolve.DirectoryCodeResolver;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
-import io.javalin.http.NotFoundResponse;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
 import podweb.controllers.*;
@@ -58,7 +58,7 @@ public class App {
         // Auth routes
         UsersController usersController = new UsersController();
         app.get("/login", usersController::loginPage);
-        // app.post("/login", usersController::login);
+        app.post("/login", usersController::login);
         app.get("/logout", usersController::logout);
 
         // Users related routes

@@ -14,25 +14,25 @@ public class UsersController {
         renderLoginPage(ctx, false);
     }
 
-//    public void login(Context ctx) {
-//        String email = ctx.formParam("email");
-//        String password = ctx.formParam("password");
-//        User user = User.o.getBy(email);
-//        boolean validPwd = false;
-//
-//        System.out.println("email " + email);
-//        System.out.println("pwd " + password);
-//        if (user != null && password != null) {
-//            validPwd = password.equals(user.password);
-//        }
-//
-//        if (validPwd) {
-//            ctx.sessionAttribute("user", user);
-//            ctx.redirect("/");
-//        } else {
-//            renderLoginPage(ctx, true);
-//        }
-//    }
+    public void login(Context ctx) {
+        String email = ctx.formParam("email");
+        String password = ctx.formParam("password");
+        User user = User.o.getFirstBy("email", email);
+        boolean validPwd = false;
+
+        System.out.println("email " + email);
+        System.out.println("pwd " + password);
+        if (user != null && password != null) {
+            validPwd = password.equals(user.password);
+        }
+
+        if (validPwd) {
+            ctx.sessionAttribute("user", user);
+            ctx.redirect("/");
+        } else {
+            renderLoginPage(ctx, true);
+        }
+    }
 
     private void renderLoginPage(Context ctx, boolean error) {
         ctx.render("login.jte", Map.of("error", error));
