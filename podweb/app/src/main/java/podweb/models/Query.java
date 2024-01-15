@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -64,22 +65,28 @@ public class Query<T> {
         }
     }
 
-    static void setup() {
+    static private void setup() {
         if (connection != null)
             return;
         // Establish a connection to the database
         startConnection();
     }
 
-    void startTransaction() throws SQLException {
+    public static void startTransaction() throws SQLException {
+        if (connection == null)
+            setup();
         connection.setAutoCommit(false);
     }
 
-    void commit() throws SQLException {
+    public static void commit() throws SQLException {
+        if (connection == null)
+            setup();
         connection.commit();
     }
 
-    void rollback() throws SQLException {
+    public static void rollback() throws SQLException {
+        if (connection == null)
+            setup();
         connection.rollback();
     }
 
@@ -104,6 +111,7 @@ public class Query<T> {
     }
 
     public ArrayList<T> query(String query, Object[] list) {
+        System.out.println("query(): " + query);
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             if (list != null)
@@ -131,19 +139,43 @@ public class Query<T> {
     }
 
     public int update(String query, Object[] list) {
+        boolean isInsert = query.toLowerCase().startsWith("insert into");
+
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             if (list != null)
                 applyParamsOnStatement(statement, list);
-            return statement.executeUpdate();
+            System.out.println("Query: " + query);
+            System.out.println("Params: ");
+            for (Object object : list) {
+                System.out.println(object);
+            }
+            int affectedRows = statement.executeUpdate();
+            System.out.println("isInsert " + isInsert);
+            if (isInsert) {
+                ResultSet set = statement.getGeneratedKeys();
+                try {
+                    set.next();
+                    int id = set.getInt("id");
+                    System.out.println("found id  " + id);
+                    return id;
+                } catch (SQLException e) {
+                    return affectedRows; // no id in this table, just ignore
+                }
+            }
+            return affectedRows;
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("SQL Error: " + e);
         }
         return -1;
     }
 
     private static void applyParamsOnStatement(PreparedStatement statement, Object[] list)
             throws SQLException {
+        System.out.println("applyParamsOnStatement() Params: ");
+        for (Object object : list) {
+            System.out.println(object);
+        }
         int cnt = 1;
         for (Object object : list) {
             if (object instanceof Integer o) {
@@ -162,6 +194,8 @@ public class Query<T> {
         ArrayList<Object> list = new ArrayList<>();
         try {
             for (Field field : object.getClass().getDeclaredFields()) {
+                if (field.getName().equals("o") || field.getName().equals("q") || field.getName().equals("id"))
+                    continue;
                 field.setAccessible(true);
                 list.add(field.get(object));
             }
@@ -184,6 +218,8 @@ public class Query<T> {
                 Constructor<T> ctor = ref.getConstructor();
                 T item = ctor.newInstance();
                 for (Field field : fields) {
+                    if (field.getName().equals("o") || field.getName().equals("q"))
+                        continue;
                     try {
                         set.findColumn(field.getName());
                         field.set(item, set.getObject(field.getName()));
