@@ -1,9 +1,8 @@
 package podweb.models;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
-public class Episode {
+public class Episode extends Model<Episode>{
     public int id;
     public String title;
     public String description;
@@ -11,15 +10,17 @@ public class Episode {
     public Timestamp released_at;
     public String audio_url;
     public int podcast_id;
+    public static Episode o = new Episode();
 
     private static Query<Episode> q = new Query<>(Episode.class);
 
-    public static ArrayList<Episode> getByPodcast(int id) {
-        String query = "SELECT * FROM episodes WHERE podcast_id = ? LIMIT 10;";
-        return q.query(query, new Object[] { id });
+    @Override
+    public String table(){
+        return "episodes";
     }
 
-    public Podcast podcast() {
-        return Podcast.find(podcast_id);
+    @Override
+    public Query<Episode> getQuery(){
+        return q;
     }
 }
