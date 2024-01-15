@@ -33,11 +33,15 @@ public class PodcastsController {
         try {
             String keyword = ctx.queryParam("q");
             ArrayList<EpisodeSearch> e = EpisodeSearch.search(keyword);
-            ctx.render("resultSearch.jte", Map.of("episodes", e));
+            ctx.render("resultSearch.jte", Map.of("loggedUser", App.loggedUser(ctx),"episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void ranking(Context ctx){
+
     }
 }
