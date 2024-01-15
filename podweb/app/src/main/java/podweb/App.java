@@ -51,12 +51,17 @@ public class App {
         app.get("/", podcastsController::index);
         app.get("/podcasts/{id}", podcastsController::detailPodcast);
         app.get("/search", podcastsController::search);
+        app.get("/ranking", podcastsController::ranking);
 
         // Auth routes
         UsersController usersController = new UsersController();
         app.get("/login", usersController::loginPage);
-        app.post("/login", usersController::login);
+        //app.post("/login", usersController::login);
         app.get("/logout", usersController::logout);
+
+        // Users related routes
+        app.get("/user/{id}", usersController::showProfile);
+        app.get("/user", usersController::showAllUsers);
         return app;
     }
 

@@ -14,15 +14,15 @@ import io.javalin.http.Context;
 public class PodcastsController {
 
     public void index(Context ctx) {
-        ArrayList<Podcast> podcasts = Podcast.all();
+        ArrayList<Podcast> podcasts = Podcast.o.all();
 
         ctx.render("podcasts.jte", Map.of("loggedUser", App.loggedUser(ctx), "podcasts", podcasts));
     }
 
     public void detailPodcast(Context ctx) {
         try {
-            Podcast p = Podcast.find(Integer.parseInt(ctx.pathParam("id")));
-            ArrayList<Episode> e = Episode.getByPodcast(p.id);
+            Podcast p = Podcast.o.find(Integer.parseInt(ctx.pathParam("id")));
+            ArrayList<Episode> e = Episode.o.getBy("podcast_id",p.id);
             ctx.render("podcast.jte", Map.of("loggedUser", App.loggedUser(ctx), "podcast", p, "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);

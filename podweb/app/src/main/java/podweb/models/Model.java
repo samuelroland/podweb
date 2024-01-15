@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public abstract class Model<T> {
     abstract public String table();
 
+    public static Podcast o = new Podcast();
+
     abstract public Query<T> getQuery();
 
     public ArrayList<T> all() {
