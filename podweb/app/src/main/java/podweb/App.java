@@ -10,6 +10,8 @@ import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.HttpResponseException;
+import io.javalin.http.NotFoundResponse;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
 import podweb.controllers.*;
@@ -56,20 +58,56 @@ public class App {
         // Auth routes
         UsersController usersController = new UsersController();
         app.get("/login", usersController::loginPage);
-        //app.post("/login", usersController::login);
+        // app.post("/login", usersController::login);
         app.get("/logout", usersController::logout);
 
         // Users related routes
         app.get("/user/{id}", usersController::showProfile);
         app.get("/user", usersController::showAllUsers);
+
+        manageErrorPages(app);
         return app;
+    }
+
+    private static void manageErrorPages(Javalin app) {
+        // Do not show these sensitive errors in production
+        if (isProduction())
+            return;
+
+        // Affichage d'une joli page avec l'erreur et sa stack trace
+        // très utile pour le debug
+        app.exception(Exception.class, (e, ctx) -> {
+            String msg = "<div style='font-family: monospace; font-size: 1.5em;'><h1>Java exception</h1>";
+            msg += "\n<h2>" + e.toString() + "</h2>\n";
+            for (var element : e.getStackTrace()) {
+                boolean bold = element.getClassName().startsWith("podweb");
+                msg += "<br>" + (bold ? ("<strong>" + element + "</strong>") : element);
+            }
+            msg += "</div>";
+            ctx.html(msg);
+            ctx.status(500);
+        });
+
+        // Stack trace on 404 error
+        app.exception(HttpResponseException.class, (e, ctx) -> {
+            String msg = "<div style='font-family: monospace; font-size: 1.5em;'><h1>HttpResponseException</h1>";
+            msg += "\n<h2>" + e.toString() + "</h2>\n";
+            for (var element : e.getStackTrace()) {
+                boolean bold = element.getClassName().startsWith("podweb");
+                msg += "<br>" + (bold ? ("<strong>" + element + "</strong>") : element);
+            }
+            msg += "</div>";
+            ctx.html(msg);
+            ctx.status(404);
+        });
+
     }
 
     // Configuration of JTE templates
     // Taken from the Javalin tutorials:
     // https://javalin.io/tutorials/jte#precompiling-templates
     private static TemplateEngine createTemplateEngine() {
-        if (System.getenv("PODWEB_PRODUCTION") != null) {
+        if (isProduction()) {
             // Production mode, use precompiled classes loaded in the JAR
             return TemplateEngine.createPrecompiled(Path.of("jte-classes"), ContentType.Html);
         } else {
@@ -89,5 +127,9 @@ public class App {
         if (possibleUser == null)
             return 1; // just not a user as Map.of doesn't support null values
         return (User) possibleUser;
+    }
+
+    public static boolean isProduction() {
+        return System.getenv("PODWEB_PRODUCTION") != null;
     }
 }
