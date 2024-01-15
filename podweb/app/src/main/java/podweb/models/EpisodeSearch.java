@@ -1,6 +1,7 @@
 package podweb.models;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class EpisodeSearch {
@@ -8,7 +9,7 @@ public class EpisodeSearch {
     public String title;
     public String description;
     public int duration;
-    public String released_at;
+    public Timestamp released_at;
     public String audio_url;
     public int podcast_id;
     public String podcast_title;
@@ -20,8 +21,8 @@ public class EpisodeSearch {
     public EpisodeSearch() {
     }
 
-    public EpisodeSearch(int id, String title, String description, int duration, String released_at, String audio_url,
-            int podcast_id, String podcast_title, String podcast_description, String podcast_author) {
+    public EpisodeSearch(int id, String title, String description, int duration, Timestamp released_at, String audio_url,
+                         int podcast_id, String podcast_title, String podcast_description, String podcast_author) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -34,13 +35,7 @@ public class EpisodeSearch {
         this.podcast_author = podcast_author;
     }
 
-    @Override
-    public String toString() {
-        return "EpisodeSearch [audio_url=" + audio_url + ", description=" + description + ", duration=" + duration
-                + ", id=" + id + ", podcast_author=" + podcast_author + ", podcast_description=" + podcast_description
-                + ", podcast_id=" + podcast_id + ", podcast_title=" + podcast_title + ", released_at=" + released_at
-                + ", title=" + title + "]";
-    }
+
 
     public static ArrayList<EpisodeSearch> search(String keyword) throws SQLException {
         String query = "SELECT " +
@@ -56,11 +51,11 @@ public class EpisodeSearch {
                 ", p.author AS podcast_author " +
                 " FROM episodes e " +
                 "INNER JOIN podcasts p ON e.podcast_id = p.id " +
-                "WHERE p.title LIKE ? " +
-                "OR e.title LIKE ? " +
-                "OR p.description LIKE ? " +
-                "OR e.description LIKE ? " +
-                "OR p.author LIKE ? " +
+                "WHERE p.title ILIKE ? " +
+                "OR e.title ILIKE ? " +
+                "OR p.description ILIKE ? " +
+                "OR e.description ILIKE ? " +
+                "OR p.author ILIKE ? " +
                 "LIMIT 10;";
 
         String[] texts = new String[5];
