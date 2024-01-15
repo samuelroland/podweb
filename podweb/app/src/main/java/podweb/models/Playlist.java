@@ -11,7 +11,7 @@ public class Playlist extends Model<Playlist>{
 
     @Override
     public String table(){
-        return "playlist";
+        return "playlists";
     }
 
     @Override

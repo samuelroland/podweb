@@ -16,7 +16,7 @@ public class Comment extends Model<Comment>{
     
     @Override
     public String table(){
-        return "comment";
+        return "comments";
     }
 
     @Override

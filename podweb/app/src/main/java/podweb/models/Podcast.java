@@ -8,6 +8,9 @@ public class Podcast extends Model<Podcast> {
     public String image;
     public String author;
     public int episodes_count;
+    public static Podcast o = new Podcast();
+
+    public static Query<Podcast> q = new Query<>(Podcast.class);
 
     @Override
     public String table() {
@@ -16,7 +19,7 @@ public class Podcast extends Model<Podcast> {
 
     @Override
     public Query<Podcast> getQuery() {
-        return new Query<Podcast>(Podcast.class);
+        return q;
     }
 
     public String toString() {

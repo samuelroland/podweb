@@ -15,7 +15,7 @@ public class Badge extends Model<Badge>{
 
     @Override
     public String table(){
-        return "badge";
+        return "badges";
     }
 
     @Override
