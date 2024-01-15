@@ -1,8 +1,6 @@
 package podweb.models;
 
-import java.util.ArrayList;
-
-public class Podcast {
+public class Podcast extends Model<Podcast> {
     public int id;
     public String title;
     public String description;
@@ -11,22 +9,14 @@ public class Podcast {
     public String author;
     public int episodes_count;
 
-    private static Query<Podcast> q = new Query<>(Podcast.class);
-
-    public static ArrayList<Podcast> all() {
-        return q.query("select * from podcasts;");
+    @Override
+    public String table() {
+        return "podcasts";
     }
 
-    public static Podcast find(int id) {
-        ArrayList<Podcast> list = q.query("select * from podcasts where id = ?", new Object[] { id });
-        if (list != null) {
-            return list.getFirst();
-        }
-        return null;
-    }
-
-    public static boolean exists(int id) {
-        return q.query("select top 1 from podcasts where id = ?", new Object[] { id }) == null;
+    @Override
+    public Query<Podcast> getQuery() {
+        return new Query<Podcast>(Podcast.class);
     }
 
     public String toString() {
