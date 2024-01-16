@@ -12,6 +12,8 @@ import java.util.Map;
 
 import io.javalin.http.Context;
 
+import static java.lang.Integer.valueOf;
+
 public class PodcastsController {
 
     public void index(Context ctx) {
@@ -54,5 +56,13 @@ public class PodcastsController {
         } catch (NumberFormatException e) {
             ctx.status(404);
         }
+    }
+
+    public void addComment(Context ctx){
+        Comment comment = new Comment();
+        comment.content = ctx.formParam("content");
+        comment.note = Integer.parseInt(ctx.formParam("note"));
+        comment.create();
+
     }
 }

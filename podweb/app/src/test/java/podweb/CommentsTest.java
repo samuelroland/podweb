@@ -42,6 +42,7 @@ public class CommentsTest {
             ArrayList<Comment> comments = Comment.o.getBy("episode_id", 1);
             for (Comment comment : comments) {
                 assertThat(page).contains(comment.content).contains(String.valueOf(comment.note));
+                assertThat(page).contains((CharSequence) comment.date);
             }
             assertThat(page).contains("Comments").contains("<textarea").contains("Send comment</button");
         });
@@ -66,39 +67,11 @@ public class CommentsTest {
     }
 
     @Test
-    public void login_post_fails_on_invalid_user_or_pwd() {
+    public void comments_can_delete_a_comment() {
         JavalinTest.test(app, (server, client) -> {
-            // Invalid user
-            var res = client.post("/login", "email=asdfsadfsdaf&password=asdf");
-            assertEquals(200, res.code());
-            String page = res.body().string();
-            assertThat(page).contains("<h1>Login");
-            assertThat(page).contains("Login error");
-
-            // Invalid pwd
-            var res2 = client.post("/login", "email=stokes.ena@example.org&password=asdfsadf");
-            assertEquals(200, res2.code());
-            String page2 = res2.body().string();
-            assertThat(page2).contains("<h1>Login");
-            assertThat(page2).contains("Login error");
+            var cCount = Comment.o.count();
         });
     }
 
-    @Test
-    public void logout_feature_exists() {
-        JavalinTest.test(app, (server, client) -> {
-            // Login
-            AppTest.actingAs(1);
-            var res = client.get("/");
-            assertThat(res.body().string()).contains("Eulalia");
 
-            // and logout
-            var res2 = client.get("/logout");
-            assertEquals(200, res.code());
-            String page = res2.body().string();
-            assertThat(page).contains("<h1>Podcasts");
-            assertThat(page).doesNotContain("Eulalia");
-            assertThat(page).doesNotContain("Logout");
-        });
-    }
 }

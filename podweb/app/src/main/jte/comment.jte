@@ -19,9 +19,9 @@
     @for(Comment c: comments)
 
     <div class="flex flex-wrap">
-        <h4 class="text-blue-500">$unsafe{"Comment from user #" + c.user_id}</h4>
-        <h3 class="text-gray-600">$unsafe{"Posted on" + c.date}</h3>
-        <h3 class="text-gray-600">$unsafe{c.content}</h3>
+        <h4 class="text-blue-600">$unsafe{"Comment from user #" + c.user_id}</h4><br>
+        <h6 class="text-gray-600">$unsafe{"Posted on" + c.date}</h6>
+        <h5 class="text-gray-800">$unsafe{c.content}</h5>
     </div>
 
     @endfor
@@ -33,6 +33,7 @@
             @keyup.enter="addItem()"></textarea>
         <button v-on:click="addItem()" class='primaryContained float-right' type="submit">Send comment</button>
     </div>
+
     `,
     loggedUser
     )

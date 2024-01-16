@@ -55,7 +55,7 @@ public class App {
         app.get("/search", podcastsController::search);
         app.get("/ranking", podcastsController::ranking);
         app.get("/podcasts/{id}/comments", podcastsController::comments);
-        //app.post("/podcasts/{id}/comments", podcastsController::addComment);
+        app.post("/podcasts/{id}/comments", podcastsController::addComment);
 
         // Auth routes
         UsersController usersController = new UsersController();
