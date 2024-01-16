@@ -1,6 +1,7 @@
 package podweb.controllers;
 
 import podweb.App;
+import podweb.models.Comment;
 import podweb.models.Episode;
 import podweb.models.EpisodeSearch;
 import podweb.models.Podcast;
@@ -43,5 +44,15 @@ public class PodcastsController {
 
     public void ranking(Context ctx){
 
+    }
+
+    public void comments(Context ctx){
+        try {
+            Episode e = Episode.o.find(Integer.parseInt(ctx.pathParam("id")));
+            ArrayList<Comment> c = Comment.o.all();
+            ctx.render("comment.jte", Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", c));
+        } catch (NumberFormatException e) {
+            ctx.status(404);
+        }
     }
 }

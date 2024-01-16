@@ -48,7 +48,7 @@ public class UsersController {
 
         try {
             User u = User.o.find(Integer.parseInt(ctx.pathParam("id")));
-            ctx.render("podcast.jte", Map.of("loggedUser", App.loggedUser(ctx), "user", u));
+            ctx.render("user.jte", Map.of("loggedUser", App.loggedUser(ctx), "user", u));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }
