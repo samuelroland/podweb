@@ -49,7 +49,7 @@ public class PodcastsController {
     public void comments(Context ctx){
         try {
             Episode e = Episode.o.find(Integer.parseInt(ctx.pathParam("id")));
-            ArrayList<Comment> c = Comment.o.all();
+            ArrayList<Comment> c =  Comment.o.getBy("episode_id", e.id);
             ctx.render("comment.jte", Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", c));
         } catch (NumberFormatException e) {
             ctx.status(404);
