@@ -1,6 +1,7 @@
 package podweb.models;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class Comment extends Model<Comment> {
     public int id;
@@ -22,5 +23,13 @@ public class Comment extends Model<Comment> {
     @Override
     public Query<Comment> getQuery() {
         return q;
+    }
+
+    // Get comments for a given episodes but ordered by parent first then
+    // subcomments so it is directly in the correct order for the view
+    // (only level needs to be calculated in controller)
+    public static ArrayList<Comment> getByEpisodesSortedByParentFirst(int episodeId) {
+        String query = "SELECT * FROM comments WHERE episode_id = ? ORDER BY CASE WHEN parent_id IS NULL THEN id ELSE parent_id END, id";
+        return q.query(query, new Object[] { episodeId });
     }
 }
