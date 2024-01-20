@@ -2,8 +2,15 @@
 echo "Podweb database setup script"
 
 # Choose your user that can create the db podweb
-export PGPASSWORD=postgres
-export PGUSER=postgres
+dotenv="../../podweb/.env"
+if ! test -f $dotenv; then
+    echo "The file .env should be set inside $dotenv to indicate DB credentials. Run this again after you created this file."
+    exit 1;
+fi
+
+source "$dotenv"
+export PGPASSWORD=$DB_USER
+export PGUSER=$DB_PWD
 
 files=(podweb-schema.sql podweb-data.sql podweb-additions.sql)
 
