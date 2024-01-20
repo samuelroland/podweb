@@ -11,8 +11,8 @@
             
             <ul class="space-y-4">
                 @for(RankedPodcast podcast : rankedPodcasts)
-                    <a href="/podcasts/${podcast.id}"> <!-- Replace "/your-target-page-url" with the actual URL -->
-                        <li class="p-4 bg-white rounded-md shadow-md flex items-center space-x-4 cursor-pointer">
+                    <a href="/podcasts/${podcast.id}" class="block"> 
+                        <li class="p-4 bg-white rounded-md shadow-md flex items-center space-x-4 cursor-pointer hover:bg-gray-100 transition-all">
                             <span class="text-4xl font-bold text-gray-500">${rankedPodcasts.indexOf(podcast) + 1}.</span>
 
                             <div class="podcast-info flex-grow">
@@ -21,8 +21,7 @@
                                 <p class="text-gray-600">Number of listenings: ${podcast.listenings_total}</p>
                             </div>
 
-                            <!-- Podcast Image (adjust to the height of the box) -->
-                            <div class="w-16 h-16 ml-4">
+                            <div class="w-32 h-32 ml-4">
                                 <img src="${podcast.image}" alt="Podcast Image" class="object-cover w-full h-full rounded-md">
                             </div>
                         </li>
