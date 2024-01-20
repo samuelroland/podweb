@@ -22,6 +22,7 @@
         <h4 class="text-blue-600">$unsafe{"Comment from user #" + c.user_id}</h4><br>
         <h6 class="text-gray-600">$unsafe{"Posted on" + c.date}</h6>
         <h5 class="text-gray-800">$unsafe{c.content}</h5>
+        <h5 class="text-gray-800">$unsafe{"Note : " + c.note}</h5>
     </div>
 
     @endfor

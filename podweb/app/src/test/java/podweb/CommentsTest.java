@@ -42,7 +42,7 @@ public class CommentsTest {
             ArrayList<Comment> comments = Comment.o.getBy("episode_id", 1);
             for (Comment comment : comments) {
                 assertThat(page).contains(comment.content).contains(String.valueOf(comment.note));
-                assertThat(page).contains((CharSequence) comment.date);
+                assertThat(page).contains(comment.date.toString());
             }
             assertThat(page).contains("Comments").contains("<textarea").contains("Send comment</button");
         });
@@ -52,9 +52,11 @@ public class CommentsTest {
     public void comments_can_create_a_comment() {
         JavalinTest.test(app, (server, client) -> {
             var cCount = Comment.o.count();
-            var res = client.post("/podcasts/1/comments", "content=heythere&note=5");
+            var res = client.post("/podcasts/1/comments", "content=heythere&note=5&episode_id=1&user_id=1&parent_id=1");
             assertEquals(200, res.code());
-            String page = res.body().string();
+            var res2 = client.get("/podcasts/1/comments");
+            assert res2.body() != null;
+            String page = res2.body().string();
             assertThat(page).doesNotContain("Login error");
             assertThat(page).contains("heythere").contains("5");
 
@@ -70,6 +72,14 @@ public class CommentsTest {
     public void comments_can_delete_a_comment() {
         JavalinTest.test(app, (server, client) -> {
             var cCount = Comment.o.count();
+            var res = client.delete("/podcasts/1/comments/1");
+            assertEquals(200, res.code());
+            assertEquals(cCount - 1, Comment.o.count());
+            var res2 = client.get("/podcasts/1/comments");
+            assert res2.body() != null;
+            String page = res2.body().string();
+            assertThat(page).doesNotContain("Login error");
+            assertThat(page).doesNotContain("Lorem");
         });
     }
 

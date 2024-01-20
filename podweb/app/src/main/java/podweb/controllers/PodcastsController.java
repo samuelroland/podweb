@@ -7,8 +7,12 @@ import podweb.models.EpisodeSearch;
 import podweb.models.Podcast;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import io.javalin.http.Context;
 
@@ -61,8 +65,38 @@ public class PodcastsController {
     public void addComment(Context ctx){
         Comment comment = new Comment();
         comment.content = ctx.formParam("content");
-        comment.note = Integer.parseInt(ctx.formParam("note"));
-        comment.create();
+        comment.note = Integer.parseInt(Objects.requireNonNull(ctx.formParam("note")));
+        comment.episode_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("episode_id")));
+        comment.user_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("user_id")));
+        comment.parent_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("parent_id")));
+        comment.date = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
+        comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
 
+        if(comment.create()){
+            ctx.status(200);
+        }
+        else {
+            ctx.status(500);
+        }
+
+    }
+
+    public void deleteComment(Context ctx) {
+        try {
+            int id = Integer.parseInt(ctx.pathParam("id2"));
+            Comment comment = Comment.o.find(id);
+            if (comment != null) {
+                if (comment.delete(id)) {
+                    ctx.status(200);
+                } else {
+                    ctx.status(500);
+                }
+            } else {
+                ctx.status(404);
+            }
+        } catch (NumberFormatException e) {
+            System.err.println(e);
+            ctx.status(400);
+        }
     }
 }
