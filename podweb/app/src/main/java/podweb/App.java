@@ -53,9 +53,11 @@ public class App {
         app.get("/podcasts/{id}", podcastsController::detailPodcast);
         app.get("/search", podcastsController::search);
         app.get("/ranking", podcastsController::ranking);
-        app.get("/podcasts/{id}/comments", podcastsController::comments);
-        app.post("/podcasts/{id}/comments", podcastsController::addComment);
-        app.delete("/podcasts/{id1}/comments/{id2}", podcastsController::deleteComment);
+
+        // Episodes related routes (mostly comments)
+        app.get("/episodes/{id}/comments", podcastsController::comments);
+        app.post("/episodes/{id}/comments", podcastsController::addComment);
+        app.delete("/episodes/{id1}/comments/{id2}", podcastsController::deleteComment);
 
         // Auth routes
         UsersController usersController = new UsersController();
