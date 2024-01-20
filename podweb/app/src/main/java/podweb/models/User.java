@@ -1,9 +1,10 @@
 package podweb.models;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
-public class User extends Model<User>{
-    public Integer id;
+public class User extends Model<User> {
+    public int id;
     public String firstname;
     public String lastname;
     public String email;
@@ -14,12 +15,12 @@ public class User extends Model<User>{
     private static Query<User> q = new Query<>(User.class);
 
     @Override
-    public String table(){
+    public String table() {
         return "users";
     }
 
     @Override
-    public Query<User> getQuery(){
+    public Query<User> getQuery() {
         return q;
     }
 }

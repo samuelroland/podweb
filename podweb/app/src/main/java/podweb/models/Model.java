@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public abstract class Model<T> {
@@ -33,6 +34,29 @@ public abstract class Model<T> {
         String query = "SELECT * FROM " + table()
                 + " WHERE " + foreignKey + " = ? ;";
         return getQuery().query(query, new Object[] { id });
+    }
+
+    public Map<Integer, T> getByIdList(Collection<Integer> ids) {
+        makeSureEntityUsesIdField();
+        String query = "SELECT * FROM " + table()
+                + " WHERE id IN (";
+
+        for (int i = 0; i < ids.size(); i++) {
+            if (i > 0)
+                query += ",";
+            query += "?";
+        }
+        query += ")";
+        ArrayList<T> list = getQuery().query(query, ids.toArray());
+        Map<Integer, T> elementsById = new TreeMap<>();
+        for (T el : list) {
+            try {
+                elementsById.put(getClass().getField("id").getInt(el), el);
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+        return elementsById;
     }
 
     public ArrayList<T> getBy(String[] foreignKeys, Integer[] ids) {
