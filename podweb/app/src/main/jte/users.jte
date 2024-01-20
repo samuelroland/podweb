@@ -8,16 +8,14 @@
 
 @template.layout(
 content = @`
-
-    @for(User u : users)
-        <div class="user">
-            <div class="user-name">
-        <a href="/user/${u.id}" class="text-blue-500">
-            <h4 class="text-blue-500">${"User : " + u.firstname}</h4>
-        </a>
-            </div>
-        </div>
-    @endfor
+    <h1>Users of Podweb</h1>
+    <ul>
+        @for(User user : users)
+        <li class="list-disc ml-3">
+            $unsafe{user.link()}
+        </li>
+        @endfor
+    </ul>
 `,
 loggedUser
 )

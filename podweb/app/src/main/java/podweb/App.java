@@ -66,8 +66,8 @@ public class App {
         app.get("/logout", usersController::logout);
 
         // Users related routes
-        app.get("/user/{id}", usersController::showProfile);
-        app.get("/user", usersController::showAllUsers);
+        app.get("/users/{id}", usersController::showProfile);
+        app.get("/users", usersController::showAllUsers);
 
         manageErrorPages(app);
         return app;
