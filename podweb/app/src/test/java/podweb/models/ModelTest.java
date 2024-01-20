@@ -189,13 +189,13 @@ public class ModelTest {
 
     @Test
     public void model_update_works_on_table_without_default_id() {
-        Queue q = Queue.o.find(1);
+        Queue q = Queue.o.all().getFirst();
         int startIndex = q.index;
 
         q.index++;
         assertTrue(q.update());
         assertEquals(startIndex + 1, q.index);
-        Queue newQ = Queue.o.find(1);
+        Queue newQ = Queue.o.find(Map.of("user_id", q.user_id, "episode_id", q.episode_id));
         assertEquals(startIndex + 1, newQ.index);
     }
 

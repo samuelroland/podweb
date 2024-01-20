@@ -22,6 +22,6 @@ public class Podcast extends Model<Podcast> {
     }
 
     public String toString() {
-        return id + " " + title + " " + image;
+        return id + " " + title + " " + author;
     }
 }

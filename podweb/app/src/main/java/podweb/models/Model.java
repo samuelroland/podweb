@@ -2,6 +2,7 @@ package podweb.models;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -22,20 +23,20 @@ public abstract class Model<T> {
     abstract public Query<T> getQuery();
 
     public ArrayList<T> all() {
-        String query = "select * from " + table() + ";";
+        String query = "SELECT * FROM " + table() + ";";
         return getQuery().query(query);
     }
 
     // Get By -> useful to filter table entries by one or more integer fields
     public ArrayList<T> getBy(String foreignKey, int id) {
-        String query = "select * from " + table()
-                + " where " + foreignKey + " = ? ;";
+        String query = "SELECT * FROM " + table()
+                + " WHERE " + foreignKey + " = ? ;";
         return getQuery().query(query, new Object[] { id });
     }
 
     public ArrayList<T> getBy(String[] foreignKeys, Integer[] ids) {
-        String query = "select * from " + table()
-                + " where ";
+        String query = "SELECT * FROM " + table()
+                + " WHERE ";
 
         for (int i = 0; i < foreignKeys.length; i++) {
             if (i > 0) {
@@ -69,8 +70,8 @@ public abstract class Model<T> {
     }
 
     public ArrayList<T> getBy(String foreignKey, Object[] o) {
-        String query = "select * from " + table()
-                + " where " + foreignKey + " = ? ;";
+        String query = "SELECT * FROM " + table()
+                + " WHERE " + foreignKey + " = ? ;";
         return getQuery().query(query, o);
     }
 
@@ -85,18 +86,17 @@ public abstract class Model<T> {
     // Find (by id or by other key fields)
     public T find(int id) {
         makeSureEntityUsesIdField();
-        return find("where id = ?", new Object[] { id });
+        return find("WHERE id = ?", new Object[] { id });
     }
 
     public T find(Map<String, Integer> fields) {
-        return find(buildWhereClauseWithKeysMap(fields), valuesOrderedByKey(fields));
+        return find(buildWhereClauseWithKeysMap(fields), valuesOrderedByKey(fields).toArray());
     }
 
     private T find(String whereClause, Object[] values) {
-        String query = "select * from " + table() + " " + whereClause;
+        String query = "SELECT * FROM " + table() + " " + whereClause;
 
         ArrayList<T> list = getQuery().query(query, values);
-        System.out.println("list " + list);
         if (list != null && list.size() == 1) {
             return list.getFirst();
         }
@@ -119,7 +119,7 @@ public abstract class Model<T> {
 
     // Create an element with attributes on the current object
     public boolean create() {
-        String query = "insert into " + table() + " (";
+        String query = "INSERT INTO " + table() + " (";
 
         String attributes = "";
         String interogationMarks = "";
@@ -136,7 +136,6 @@ public abstract class Model<T> {
             i++;
         }
         query += attributes + ") values (" + interogationMarks + ");";
-        System.out.println(query);
         int nb = getQuery().update(query, this);
         if (nb > 0) {
             this.id = nb;
@@ -155,11 +154,9 @@ public abstract class Model<T> {
         int i = 0;
         ArrayList<Object> values = new ArrayList<>(5);
         Set<String> excludeKeys = new HashSet<String>();
-        // excludeKeys.addAll(intPrimaryKeys());
-
-        // excludeKeys.add("id");
-        // excludeKeys.add("o");
-        // excludeKeys.add("q");
+        excludeKeys.add("id");
+        excludeKeys.add("o");
+        excludeKeys.add("q");
         for (Field field : getQuery().ref.getFields()) {
             if (excludeKeys.contains(field.getName()))
                 continue;
@@ -177,17 +174,33 @@ public abstract class Model<T> {
             }
             i++;
         }
-        query += attributes + "\nWHERE id = ?";
-        values.add(this.id);
-        // TODO: specify ID !!!
-        System.out.println(query);
+
+        String whereClause;
+        if (hasId()) {
+            whereClause = "WHERE id = ?";
+            values.add(this.id);
+        } else {
+            Map<String, Integer> fields = new HashMap<>();
+            for (String key : intPrimaryKeys()) {
+                try {
+                    fields.put(key, getClass().getField(key).getInt(this));
+                } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+                        | SecurityException e) {
+                    e.printStackTrace();
+                }
+            }
+            whereClause = buildWhereClauseWithKeysMap(fields);
+            values.addAll(valuesOrderedByKey(fields));
+        }
+        query += attributes + "\n" + whereClause;
+
         int nb = getQuery().update(query, values.toArray());
         return nb == 1;
     }
 
     public boolean delete(int id) {
-        return getQuery().update("delete from " + table()
-                + " where id = ?", new Object[] { id }) == 1;
+        return getQuery().update("DELETE FROM " + table()
+                + " WHERE id = ?", new Object[] { id }) == 1;
     }
 
     // --- Private helpers for various operations
@@ -217,12 +230,12 @@ public abstract class Model<T> {
     // Returns a list of values read from the given map
     // in the order defined by intPrimaryKeys()
     // This makes sure we have the same order that buildWhereClauseWithKeysMap()
-    private Object[] valuesOrderedByKey(Map<String, Integer> fields) {
+    private ArrayList<Object> valuesOrderedByKey(Map<String, Integer> fields) {
         ArrayList<Object> values = new ArrayList<>();
         for (String key : intPrimaryKeys()) {
             values.add(fields.get(key));
         }
-        return values.toArray();
+        return values;
     }
 
     // Make sure the current uses the id field as a primary key
@@ -236,4 +249,9 @@ public abstract class Model<T> {
         }
     }
 
+    // Returns true in case the entity has an entity
+    // (by looking if the default keys list is used)
+    private boolean hasId() {
+        return intPrimaryKeys() == defaultKeys;
+    }
 }
