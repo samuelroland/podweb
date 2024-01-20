@@ -23,6 +23,8 @@
         <h6 class="text-gray-600">$unsafe{"Posted on" + c.date}</h6>
         <h5 class="text-gray-800">$unsafe{c.content}</h5>
         <h5 class="text-gray-800">$unsafe{"Note : " + c.note}</h5>
+        <button v-on:click="showAnswerBox(c)" class='primaryContained float-right' type="submit">Answer to this comment</button>
+    </div>
     </div>
 
     @endfor
@@ -38,3 +40,24 @@
     `,
     loggedUser
     )
+
+<script>
+    export default {
+        data() {
+            return {
+                showAnswerBox: false,
+                answer: ''
+            }
+        },
+        methods: {
+            showAnswerBox(c) {
+                this.showAnswerBox = true;
+                this.answer = '';
+            },
+            addAnswer() {
+                // Add the answer to the database or perform any other action
+                this.showAnswerBox = false;
+            }
+        }
+    }
+</script>
