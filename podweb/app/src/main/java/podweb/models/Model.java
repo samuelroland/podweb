@@ -2,14 +2,15 @@ package podweb.models;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 public abstract class Model<T> {
-    public int id;
     private static String[] defaultKeys = new String[] { "id" };
 
     abstract public String table();
@@ -90,7 +91,7 @@ public abstract class Model<T> {
     }
 
     public T find(Map<String, Integer> fields) {
-        return find(buildWhereClauseWithKeysMap(fields), valuesOrderedByKey(fields).toArray());
+        return find(buildWhereClauseWithKeysMap(fields.keySet()), valuesOrderedByKey(fields).toArray());
     }
 
     private T find(String whereClause, Object[] values) {
@@ -136,9 +137,14 @@ public abstract class Model<T> {
             i++;
         }
         query += attributes + ") values (" + interogationMarks + ");";
-        int nb = getQuery().update(query, this);
+        Integer nb = getQuery().update(query, this);
         if (nb > 0) {
-            this.id = nb;
+            try {
+                // Try to set id (it may fails)
+                getClass().getField("id").set(this, nb);
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+                e.printStackTrace();
+            }
         } else if (nb == 0) {
             return false; // not an id but 0 line affected so action failed
         }
@@ -152,7 +158,7 @@ public abstract class Model<T> {
 
         String attributes = "";
         int i = 0;
-        ArrayList<Object> values = new ArrayList<>(5);
+        LinkedList<Object> values = new LinkedList<>();
         Set<String> excludeKeys = new HashSet<String>();
         excludeKeys.add("id");
         excludeKeys.add("o");
@@ -175,32 +181,60 @@ public abstract class Model<T> {
             i++;
         }
 
-        String whereClause;
-        if (hasId()) {
-            whereClause = "WHERE id = ?";
-            values.add(this.id);
-        } else {
-            Map<String, Integer> fields = new HashMap<>();
-            for (String key : intPrimaryKeys()) {
-                try {
-                    fields.put(key, getClass().getField(key).getInt(this));
-                } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-                        | SecurityException e) {
-                    e.printStackTrace();
-                }
-            }
-            whereClause = buildWhereClauseWithKeysMap(fields);
-            values.addAll(valuesOrderedByKey(fields));
-        }
-        query += attributes + "\n" + whereClause;
+        query += attributes + "\n" + buildWhereClauseAndFillValuesWithInstance(values);
 
         int nb = getQuery().update(query, values.toArray());
         return nb == 1;
     }
 
-    public boolean delete(int id) {
+    // Returns the element given by id or the element loaded in the current object
+    // Returns false on fails (not found or other errors like foreign key errors)
+    // Returns true if one line was affected (if there are more lines this is a bug)
+    public boolean deleteById(int id) {
         return getQuery().update("DELETE FROM " + table()
                 + " WHERE id = ?", new Object[] { id }) == 1;
+    }
+
+    public boolean delete() {
+        ArrayList<Object> params = new ArrayList<>();
+        var nb = getQuery().update("DELETE FROM " + table() + " " +
+                buildWhereClauseAndFillValuesWithInstance(params), params.toArray());
+        System.out.println("delete nb " + nb);
+        return nb == 1;
+    }
+
+    // It looks at the object, build the where clause for unique selection and fill
+    // param values on given collection reference
+    private String buildWhereClauseAndFillValuesWithInstance(Collection<Object> values) {
+        String whereClause;
+
+        // If it has an id, it's easy
+        if (hasId()) {
+            whereClause = "WHERE id = ?";
+            try {
+                Field field = getClass().getField("id");
+                field.setAccessible(true);
+                values.add(field.getInt(this));
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+                e.printStackTrace();
+                throw new RuntimeException("The class " + getClass().getSimpleName()
+                        + " should have an 'int id' field or defines other keys");
+            }
+            return whereClause;
+        } else {
+            // Othwerise we have to take other keys to identify the element
+            LinkedList<String> fields = new LinkedList<>();
+            for (String key : intPrimaryKeys()) {
+                try {
+                    fields.add(key);
+                    values.add(getClass().getField(key).getInt(this));
+                } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+                        | SecurityException e) {
+                    e.printStackTrace();
+                }
+            }
+            return buildWhereClauseWithKeysMap(fields);
+        }
     }
 
     // --- Private helpers for various operations
@@ -209,12 +243,12 @@ public abstract class Model<T> {
     // it will check that all required keys for this entity (returned by
     // intPrimaryKeys()) are present in the map
     // It will then return the where clause "where user_id = ? and episode_id = ?"
-    private String buildWhereClauseWithKeysMap(Map<String, Integer> fields) {
-        String queryPart = "where ";
+    private String buildWhereClauseWithKeysMap(Collection<String> fields) {
+        String queryPart = "WHERE ";
         int count = 0;
         String[] keys = intPrimaryKeys();
         for (String key : keys) {
-            if (!fields.containsKey(key))
+            if (!fields.contains(key))
                 throw new RuntimeException(
                         "Model.buildWhereClauseWithKeysMap(): field "
                                 + key + " not found in given Map but necessary to find a unique element on " + table());

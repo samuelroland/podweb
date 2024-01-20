@@ -60,15 +60,15 @@ public class ModelTest {
     public void model_find_fails_on_table_without_all_non_ids_keys() {
         // Wrong method
         assertThrows(RuntimeException.class, () -> {
-            Queue q = Queue.o.find(87);
+            Queue.o.find(87);
         });
 
         assertThrows(RuntimeException.class, () -> {
-            Queue q = Queue.o.find(Map.of("episode_id", 87));
+            Queue.o.find(Map.of("episode_id", 87));
         });
 
         assertThrows(RuntimeException.class, () -> {
-            Queue q = Queue.o.find(Map.of("user_id", 87));
+            Queue.o.find(Map.of("user_id", 87));
         });
 
         // No exception when just not found
@@ -199,6 +199,47 @@ public class ModelTest {
         assertEquals(startIndex + 1, newQ.index);
     }
 
-    // TODO: test and implement updating classes with other unique fields than id
+    @Test
+    public void model_delete_works() {
+        int cCount = Comment.o.count();
 
+        Comment c = new Comment();
+        c.content = "haha";
+        c.note = 12;
+        c.date = new Timestamp(System.currentTimeMillis());
+        c.user_id = 2;
+        c.episode_id = 1;
+        assertTrue(c.create());
+
+        assertEquals(cCount + 1, Comment.o.count());
+
+        assertTrue(c.delete());
+        assertEquals(cCount, Comment.o.count());
+
+        assertFalse(c.delete()); // not found the second time
+    }
+
+    @Test
+    public void model_delete_returns_false_on_fail() throws SQLException {
+        Podcast p = Podcast.o.find(27);
+        assertFalse(p.delete());
+
+        // We expect a crash and all commands in the transaction to be ignored, so let's
+        // start another transaction
+        Query.rollback();
+        Query.startTransaction();
+
+        // Make sure it has not been deleted
+        assertNotNull(Podcast.o.find(27));
+    }
+
+    @Test
+    public void model_delete_on_table_without_default_id() {
+        int qCount = Queue.o.count();
+        Queue q = Queue.o.all().getFirst();
+        assertTrue(q.delete());
+        assertNull(Queue.o.find(Map.of("episode_id", q.episode_id, "user_id", q.user_id)));
+
+        assertEquals(qCount - 1, Queue.o.count());
+    }
 }
