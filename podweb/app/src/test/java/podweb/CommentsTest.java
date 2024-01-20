@@ -11,6 +11,7 @@ import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
 import podweb.models.Comment;
 import podweb.models.Query;
+import podweb.models.User;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -36,14 +37,18 @@ public class CommentsTest {
     @Test
     public void comments_page_exists() {
         JavalinTest.test(app, (server, client) -> {
-            var res = client.get("/episodes/1/comments");
+            var res = client.get("/episodes/74/comments");
             assertEquals(200, res.code());
             String page = res.body().string();
-            ArrayList<Comment> comments = Comment.o.getBy("episode_id", 1);
+            ArrayList<Comment> comments = Comment.o.getBy("episode_id", 74);
             for (Comment comment : comments) {
                 assertThat(page).contains(comment.content).contains(String.valueOf(comment.note));
                 assertThat(page).contains(comment.date.toString());
+                assertThat(page).contains(User.o.find(comment.user_id).firstname);
+                assertThat(page).contains(User.o.find(comment.user_id).lastname);
             }
+            // TODO: support authors display
+            // TODO: support subcomments
             assertThat(page).contains("Comments").contains("<textarea").contains("Send comment</button");
         });
     }

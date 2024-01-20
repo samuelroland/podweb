@@ -25,3 +25,7 @@ h3 {
 h4 {
 	@apply text-xl
 }
+
+.user-link {
+    @apply text-blue-600 hover:underline
+}
