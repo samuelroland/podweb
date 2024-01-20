@@ -28,9 +28,4 @@ public class Podcast extends Model<Podcast> {
         return id + " " + title + " " + author;
     }
 
-
-    public static ArrayList<Podcast> ranking(){
-        String query = "select * from podcasts_ranking;";
-        return q.query(query);
-    }
 }

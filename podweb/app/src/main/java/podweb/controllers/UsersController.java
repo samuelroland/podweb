@@ -5,7 +5,10 @@ import java.util.Map;
 
 import io.javalin.http.Context;
 import podweb.App;
+import podweb.models.Badge;
 import podweb.models.Episode;
+import podweb.models.Obtain;
+import podweb.models.Playlist;
 import podweb.models.Podcast;
 import podweb.models.User;
 
@@ -48,7 +51,9 @@ public class UsersController {
 
         try {
             User u = User.o.find(Integer.parseInt(ctx.pathParam("id")));
-            ctx.render("user.jte", Map.of("loggedUser", App.loggedUser(ctx), "user", u));
+            ArrayList<Badge> b = Badge.byUser(u.id);
+            ArrayList<Playlist> p = Playlist.o.getBy("user_id", u.id);
+            ctx.render("user.jte", Map.of("loggedUser", App.loggedUser(ctx), "user", u, "badges", b, "playlists", p));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }

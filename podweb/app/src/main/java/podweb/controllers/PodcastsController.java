@@ -5,6 +5,7 @@ import podweb.models.Comment;
 import podweb.models.Episode;
 import podweb.models.EpisodeSearch;
 import podweb.models.Podcast;
+import podweb.models.RankedPodcast;
 import podweb.models.User;
 
 import java.sql.SQLException;
@@ -51,8 +52,8 @@ public class PodcastsController {
     }
 
     public void ranking(Context ctx) {
-        ArrayList<Podcast> p = Podcast.ranking();
-        ctx.render("ranking.jte", Map.of("loggedUser", App.loggedUser(ctx), "rankedPodcasts", p));
+        ArrayList<RankedPodcast> rP = RankedPodcast.ranking();
+        ctx.render("ranking.jte", Map.of("loggedUser", App.loggedUser(ctx), "rankedPodcasts", rP));
     }
 
     public void comments(Context ctx) {

@@ -18,8 +18,7 @@ public class EpisodeSearch {
 
     private static Query<EpisodeSearch> q = new Query<>(EpisodeSearch.class);
 
-    public EpisodeSearch() {
-    }
+    public EpisodeSearch(){}
 
     public EpisodeSearch(int id, String title, String description, int duration, Timestamp released_at, String audio_url,
                          int podcast_id, String podcast_title, String podcast_description, String podcast_author) {

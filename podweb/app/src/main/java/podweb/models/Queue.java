@@ -5,6 +5,7 @@ public class Queue extends Model<Queue> {
     public int episode_id;
     public int index;
     public static Queue o = new Queue();
+    
     private static String[] keys = new String[] { "user_id", "episode_id" };
     private static Query<Queue> q = new Query<>(Queue.class);
 
