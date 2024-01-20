@@ -70,7 +70,7 @@ public class PodcastsController {
         comment.user_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("user_id")));
         comment.parent_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("parent_id")));
         comment.date = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
-        comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
+        //comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
 
         if(comment.create()){
             ctx.status(200);

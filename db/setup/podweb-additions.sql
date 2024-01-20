@@ -100,46 +100,43 @@ CREATE OR REPLACE FUNCTION comments_badge_check()
 RETURNS TRIGGER AS
 $$
 DECLARE
-    badge RECORD;
-    count_comments INT;
-    badge_exists INT;
+    badge_count INT;
+    badge_id_to_award INT;
 BEGIN
+    -- Count the comments for the user
+    SELECT COUNT(*) INTO badge_count FROM comments WHERE user_id = NEW.user_id;
 
-    SELECT COUNT(*) INTO count_comments FROM comments WHERE user_id = NEW.user_id;
+    -- Find a badge that matches the number of comments
+    SELECT id INTO badge_id_to_award
+    FROM badges
+    WHERE type = 3 AND condition_value = badge_count;
 
-	IF NEW.count_comments IS DISTINCT FROM OLD.count_comments THEN
-	    -- Check si le badge existe déjà, au cas ou on enlève une playlist
-        SELECT COUNT(*) INTO badge_exists FROM obtain WHERE user_id = NEW.user_id AND badge_id = NEW.badge_id;
-        IF(badge_exists >= 1) THEN
-            RETURN NEW;
+    IF FOUND THEN
+        -- Check if the badge already exists
+        IF NOT EXISTS (SELECT 1 FROM obtain WHERE user_id = NEW.user_id AND badge_id = badge_id_to_award) THEN
+            -- Award the badge if not already given
+            INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge_id_to_award);
         END IF;
-	    -- CommentsCount est le type 3
-		FOR badge IN SELECT * FROM badges WHERE type = 3 LOOP
-			IF NEW.count_comments = badge.condition_value THEN
-			    INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge.id);
-			    EXIT;
-			END IF;
+    END IF;
 
-		END LOOP;
-	END IF;
-	RETURN NEW;
+    RETURN NEW;
 END;
 $$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER listening_change
+CREATE TRIGGER listening_change
 AFTER INSERT OR UPDATE ON listen
 FOR EACH ROW
 EXECUTE FUNCTION listening_badge_check();
 
-CREATE OR REPLACE TRIGGER playlist_change
+CREATE TRIGGER playlist_change
 AFTER INSERT OR UPDATE ON playlists
 FOR EACH ROW
 EXECUTE FUNCTION playlist_badge_check();
 
-CREATE OR REPLACE TRIGGER comments_change
-AFTER INSERT OR UPDATE ON comments
+CREATE TRIGGER check_user_comments_badge
+AFTER INSERT ON comments
 FOR EACH ROW
 EXECUTE FUNCTION comments_badge_check();
 
