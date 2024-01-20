@@ -36,7 +36,7 @@ public class CommentsTest {
     @Test
     public void comments_page_exists() {
         JavalinTest.test(app, (server, client) -> {
-            var res = client.get("/podcasts/1/comments");
+            var res = client.get("/episodes/1/comments");
             assertEquals(200, res.code());
             String page = res.body().string();
             ArrayList<Comment> comments = Comment.o.getBy("episode_id", 1);
@@ -52,9 +52,9 @@ public class CommentsTest {
     public void comments_can_create_a_comment() {
         JavalinTest.test(app, (server, client) -> {
             var cCount = Comment.o.count();
-            var res = client.post("/podcasts/1/comments", "content=heythere&note=5&episode_id=1&user_id=1&parent_id=1");
+            var res = client.post("/episodes/1/comments", "content=heythere&note=5&episode_id=1&user_id=1&parent_id=1");
             assertEquals(200, res.code());
-            var res2 = client.get("/podcasts/1/comments");
+            var res2 = client.get("/episodes/1/comments");
             assert res2.body() != null;
             String page = res2.body().string();
             assertThat(page).doesNotContain("Login error");
@@ -64,9 +64,9 @@ public class CommentsTest {
 
             // Ne fonctionne plus comme il le faut, ne donne pas le dernier commentaire???
 
-            //var newComment = Comment.o.getBy("episode_id", 1).getLast();
-            //assertEquals(newComment.content, "heythere");
-            //assertEquals(5, newComment.note);
+            // var newComment = Comment.o.getBy("episode_id", 1).getLast();
+            // assertEquals(newComment.content, "heythere");
+            // assertEquals(5, newComment.note);
         });
     }
 
@@ -74,18 +74,18 @@ public class CommentsTest {
     public void comments_can_delete_a_comment() {
         JavalinTest.test(app, (server, client) -> {
             var cCount = Comment.o.count();
-            var res = client.delete("/podcasts/1/comments/1");
+            var res = client.delete("/episodes/1/comments/1");
             assertEquals(200, res.code());
-            // Doit faire -2 pour je ne sais quelle raison, est ce qu'on duplique les commentaires??
+            // Doit faire -2 pour je ne sais quelle raison, est ce qu'on duplique les
+            // commentaires??
 
             assertEquals(cCount - 2, Comment.o.count());
-            var res2 = client.get("/podcasts/1/comments");
+            var res2 = client.get("/episodes/1/comments");
             assert res2.body() != null;
             String page = res2.body().string();
             assertThat(page).doesNotContain("Login error");
             assertThat(page).doesNotContain("Lorem");
         });
     }
-
 
 }
