@@ -13,5 +13,16 @@ for file in "${files[@]}"; do
 	psql -h "127.0.0.1" -U "$PGUSER" -a -f $file -v ON_ERROR_STOP=1 | grep ERROR
 done
 
+## Set last inserted id to the max one because Postgres doesn't update it when doing insert into with given IDs...
+## It was causing failures of duplicated primary keys values on insert
+for table in `grep -Po "(?<=CREATE TABLE).*(?= \()" podweb-schema.sql`; do
+    echo "Trying to update last id of table $table to max id..."
+    query=("set search_path=podweb; SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${table}));")
+
+    # Note: it will throw errors on tables without ID but we can ignore them
+    psql -h "127.0.0.1" -U "$PGUSER" -a -c "$query" -v ON_ERROR_STOP=1 &> /dev/null
+done
+
+
 echo "
 Seems to be all good !"
