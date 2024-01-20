@@ -85,19 +85,15 @@ public class PodcastsController {
     public void deleteComment(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id2"));
-            Comment comment = Comment.o.find(id);
-            if (comment != null) {
-                if (comment.delete(id)) {
-                    ctx.status(200);
-                } else {
-                    ctx.status(500);
-                }
+            if (Comment.o.deleteById(id)) {
+                // todo: back to previous page
             } else {
-                ctx.status(404);
+                // todo: previous page with error message
             }
         } catch (NumberFormatException e) {
             System.err.println(e);
             ctx.status(400);
         }
     }
+    
 }
