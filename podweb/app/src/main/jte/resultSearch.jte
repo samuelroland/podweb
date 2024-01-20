@@ -4,10 +4,16 @@
 
 @param Object loggedUser
 @param ArrayList<EpisodeSearch> episodes
+@param String query
 
     @template.layout(
     content = @`
-
+    <h1>Search</h1>
+        <form class="flex" action="/search" method="GET">
+            <input value="${query}" type="text" name="q" class="p-1 w-full flex-1" placeholder="Search in title, description and author texts!">
+            <button type="submit" class="ml-3">Search</button>
+        </form>
+    @if (!episodes.isEmpty())
     <h3 class="">Episodes trouvés : </h3>
     <div class="">
         @if (episodes.isEmpty())
@@ -18,18 +24,7 @@
         <div class="my-3">
             <div class="text-gray-700">
                 <p class="">$unsafe{episode.description.replace("\\n", "")}</p>
-                <p class="" id="formattedDuration_${episode.id}"></p>
-
-                <script>
-                    const durationInSeconds_${episode.id} = ${episode.duration};
-                    const hours_${episode.id} = Math.floor(durationInSeconds_${episode.id} / 3600);
-                    const minutes_${episode.id} = Math.floor((durationInSeconds_${episode.id} % 3600) / 60);
-                    const seconds_${episode.id} = durationInSeconds_${episode.id} % 60;
-
-                    const formattedDuration_${episode.id} = "Durée : " + hours_${episode.id} + "h " + minutes_${episode.id} + "m " + seconds_${episode.id} + "s";
-                    const durationElement_${episode.id} = document.getElementById("formattedDuration_${episode.id}");
-                    durationElement_${episode.id}.textContent = formattedDuration_${episode.id};
-                </script>
+                <p class="">Durée: ${episode.duration()}</p>
 
                 <a href="/podcasts/${episode.podcast_id}" class="text-blue-500">
                     <h4 class="text-blue-500">${"Viens du podcast : " + episode.podcast_title}</h4>
@@ -42,7 +37,9 @@
 
             <audio controls class="w-full my-1" src="${episode.audio_url}"></audio>
         </div>
+    </div>
         @endfor
+    @endif
 
         `,
         loggedUser

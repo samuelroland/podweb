@@ -6,7 +6,7 @@
 	@apply border-2 border-pink-500 m-3
 }
 
-button {
+button, button[type=submit] {
 	@apply bg-blue-200 hover:bg-blue-300 p-1 rounded-sm
 }
 

@@ -41,9 +41,14 @@ public class PodcastsController {
 
     public void search(Context ctx) {
         try {
-            String keyword = ctx.queryParam("q");
-            ArrayList<EpisodeSearch> e = EpisodeSearch.search(keyword);
-            ctx.render("resultSearch.jte", Map.of("loggedUser", App.loggedUser(ctx), "episodes", e));
+            String query = ctx.queryParam("q");
+            ArrayList<EpisodeSearch> episodes = new ArrayList<>();
+            if (query != null && !query.trim().isEmpty()) {
+                episodes = EpisodeSearch.search(query);
+            }
+            ctx.render("resultSearch.jte",
+                    Map.of("loggedUser", App.loggedUser(ctx), "episodes", episodes, "query",
+                            query == null ? "" : query));
         } catch (NumberFormatException e) {
             ctx.status(404);
         } catch (SQLException e) {
@@ -64,7 +69,7 @@ public class PodcastsController {
                 return;
             }
 
-            //Get the episodes grouped by parent_id
+            // Get the episodes grouped by parent_id
             ArrayList<Comment> comments = Comment.getByEpisodesSortedByParentFirst(e.id);
 
             // Only manage comments and search authors if they are found
@@ -75,7 +80,8 @@ public class PodcastsController {
                 for (var comment : comments) {
                     userIds.add(comment.user_id);
 
-                    // Calculate the level of each comment (level is 1 if parent_id == null, otherwise "parent level + 1")
+                    // Calculate the level of each comment (level is 1 if parent_id == null,
+                    // otherwise "parent level + 1")
                     commentsLevelById.put(comment.id,
                             comment.parent_id != null
                                     && commentsLevelById.containsKey(comment.parent_id)

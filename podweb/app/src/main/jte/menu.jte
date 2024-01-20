@@ -3,8 +3,4 @@
     <a href="/ranking"><button>Ranking</button></a>
     <a href="/search"><button>Search</button></a>
     <a href="/users"><button>Users</button></a>
-    <form class="search-box" action="/search" method="GET">
-        <input type="text" name="q" placeholder="Search...">
-        <button type="submit">Search</button>
-    </form>
 </div>

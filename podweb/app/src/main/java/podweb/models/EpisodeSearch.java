@@ -4,14 +4,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-public class EpisodeSearch {
-    public int id;
-    public String title;
-    public String description;
-    public int duration;
-    public Timestamp released_at;
-    public String audio_url;
-    public int podcast_id;
+public class EpisodeSearch extends Episode {
     public String podcast_title;
     public String podcast_description;
     public String podcast_author;

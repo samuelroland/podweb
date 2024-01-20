@@ -2,7 +2,7 @@ package podweb.models;
 
 import java.sql.Timestamp;
 
-public class Episode extends Model<Episode>{
+public class Episode extends Model<Episode> {
     public int id;
     public String title;
     public String description;
@@ -15,12 +15,17 @@ public class Episode extends Model<Episode>{
     private static Query<Episode> q = new Query<>(Episode.class);
 
     @Override
-    public String table(){
+    public String table() {
         return "episodes";
     }
 
     @Override
-    public Query<Episode> getQuery(){
+    public Query<Episode> getQuery() {
         return q;
+    }
+
+    public String duration() {
+        // https://stackoverflow.com/questions/266825/how-to-format-a-duration-in-java-e-g-format-hmmss
+        return String.format("%d:%02d:%02d", duration / 3600, (duration % 3600) / 60, (duration % 60));
     }
 }
