@@ -20,6 +20,8 @@ for file in "${files[@]}"; do
 	psql -h "127.0.0.1" -U "$PGUSER" -a -f $file -v ON_ERROR_STOP=1 | grep ERROR
 done
 
+echo "
+--- Fixing last inserted IDs"
 ## Set last inserted id to the max one because Postgres doesn't update it when doing insert into with given IDs...
 ## It was causing failures of duplicated primary keys values on insert
 for table in `grep -Po "(?<=CREATE TABLE).*(?= \()" podweb-schema.sql`; do
@@ -30,6 +32,9 @@ for table in `grep -Po "(?<=CREATE TABLE).*(?= \()" podweb-schema.sql`; do
     psql -h "127.0.0.1" -U "$PGUSER" -a -c "$query" -v ON_ERROR_STOP=1 &> /dev/null
 done
 
+echo "
+--- Setting all users pwd to 'pass'"
+psql -h "127.0.0.1" -U "$PGUSER" -a -c "set search_path=podweb; update users set password = 'pass';" -v ON_ERROR_STOP=1
 
 echo "
 Seems to be all good !"
