@@ -1,5 +1,6 @@
 package podweb.models;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class RankedPodcast{
@@ -7,13 +8,13 @@ public class RankedPodcast{
     public String title;
     public String image;
     public String author;
-    public int listenings_total;
+    public BigDecimal listenings_total;
     
     private static Query<RankedPodcast> q = new Query<>(RankedPodcast.class);
 
     public RankedPodcast(){}
 
-    public RankedPodcast(int id, String title, String image, String author, int listenings_total){
+    public RankedPodcast(int id, String title, String image, String author, BigDecimal listenings_total){
         this.id = id;
         this.title = title;
         this.image = image;

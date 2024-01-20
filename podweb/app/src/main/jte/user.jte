@@ -30,6 +30,8 @@
                         <li class="p-4 bg-white rounded-md shadow-md flex justify-between items-center">
                         <div class="podcast-info flex-grow mx-4">
                             <h2 class="text-lg font-semibold">${badge.name}</h2>
+                            <h4 class="text-lg">$unsafe{badge.description}</h4>
+                            <h4 class="text-lg">${badge.point}</h4>
                         </div>
                         </li>
                     @endfor
