@@ -28,6 +28,6 @@ public class User extends Model<User> {
     }
 
     public String link() {
-        return "<a class='user-link' href='/users/'" + id + ">" + fullname() + "</a>";
+        return "<a class='user-link' href='/users/" + id + "'>" + fullname() + "</a>";
     }
 }
