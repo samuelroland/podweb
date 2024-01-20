@@ -1,7 +1,6 @@
 package podweb.models;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
 public class User extends Model<User> {
     public int id;
@@ -22,5 +21,13 @@ public class User extends Model<User> {
     @Override
     public Query<User> getQuery() {
         return q;
+    }
+
+    public String fullname() {
+        return firstname + " " + lastname;
+    }
+
+    public String link() {
+        return "<a class='user-link' href='/users/'" + id + ">" + fullname() + "</a>";
     }
 }

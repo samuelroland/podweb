@@ -5,6 +5,7 @@ import podweb.models.Comment;
 import podweb.models.Episode;
 import podweb.models.EpisodeSearch;
 import podweb.models.Podcast;
+import podweb.models.User;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -29,7 +30,7 @@ public class PodcastsController {
     public void detailPodcast(Context ctx) {
         try {
             Podcast p = Podcast.o.find(Integer.parseInt(ctx.pathParam("id")));
-            ArrayList<Episode> e = Episode.o.getBy("podcast_id",p.id);
+            ArrayList<Episode> e = Episode.o.getBy("podcast_id", p.id);
             ctx.render("podcast.jte", Map.of("loggedUser", App.loggedUser(ctx), "podcast", p, "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
@@ -40,7 +41,7 @@ public class PodcastsController {
         try {
             String keyword = ctx.queryParam("q");
             ArrayList<EpisodeSearch> e = EpisodeSearch.search(keyword);
-            ctx.render("resultSearch.jte", Map.of("loggedUser", App.loggedUser(ctx),"episodes", e));
+            ctx.render("resultSearch.jte", Map.of("loggedUser", App.loggedUser(ctx), "episodes", e));
         } catch (NumberFormatException e) {
             ctx.status(404);
         } catch (SQLException e) {
@@ -48,22 +49,28 @@ public class PodcastsController {
         }
     }
 
-    public void ranking(Context ctx){
+    public void ranking(Context ctx) {
         ArrayList<Podcast> p = Podcast.ranking();
         ctx.render("ranking.jte", Map.of("loggedUser", App.loggedUser(ctx), "rankedPodcasts", p));
     }
 
-    public void comments(Context ctx){
+    public void comments(Context ctx) {
         try {
             Episode e = Episode.o.find(Integer.parseInt(ctx.pathParam("id")));
-            ArrayList<Comment> c =  Comment.o.getBy("episode_id", e.id);
-            ctx.render("comment.jte", Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", c));
+            ArrayList<Comment> comments = Comment.o.getBy("episode_id", e.id);
+            ArrayList<Integer> userIds = new ArrayList<>(comments.size());
+            for (var comment : comments) {
+                userIds.add(comment.user_id);
+            }
+            Map<Integer, User> authors = User.o.getByIdList(userIds);
+            ctx.render("comment.jte",
+                    Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", comments, "authors", authors));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }
     }
 
-    public void addComment(Context ctx){
+    public void addComment(Context ctx) {
         Comment comment = new Comment();
         comment.content = ctx.formParam("content");
         comment.note = Integer.parseInt(Objects.requireNonNull(ctx.formParam("note")));
@@ -71,12 +78,11 @@ public class PodcastsController {
         comment.user_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("user_id")));
         comment.parent_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("parent_id")));
         comment.date = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
-        //comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
+        // comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
 
-        if(comment.create()){
+        if (comment.create()) {
             ctx.status(200);
-        }
-        else {
+        } else {
             ctx.status(500);
         }
 
@@ -95,5 +101,5 @@ public class PodcastsController {
             ctx.status(400);
         }
     }
-    
+
 }

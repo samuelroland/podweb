@@ -251,8 +251,6 @@ public class ModelTest {
         ids.add(29);
         ids.add(23);
 
-        // assertEquals(40, User.o.all().size());
-
         var map = User.o.getByIdList(ids);
         assertEquals(3, map.size());
         assertEquals(1, map.get(1).id);
