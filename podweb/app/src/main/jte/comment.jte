@@ -42,7 +42,6 @@ content = @`
                 </span>
             </div>
         </div>
-        <div class="my-2">${c.id} : ${c.parent_id}</div>
         <div class="my-2">${c.content}</div>
     
         <div x-show="form">

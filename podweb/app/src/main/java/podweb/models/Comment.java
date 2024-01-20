@@ -28,6 +28,7 @@ public class Comment extends Model<Comment> {
     // Get comments for a given episodes but ordered by parent first then
     // subcomments so it is directly in the correct order for the view
     // (only level needs to be calculated in controller)
+    // https://stackoverflow.com/questions/48468366/group-by-id-followed-by-parent-id
     public static ArrayList<Comment> getByEpisodesSortedByParentFirst(int episodeId) {
         String query = "SELECT * FROM comments WHERE episode_id = ? ORDER BY CASE WHEN parent_id IS NULL THEN id ELSE parent_id END, id";
         return q.query(query, new Object[] { episodeId });
