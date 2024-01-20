@@ -17,7 +17,7 @@
             <!-- Display user information -->
             <div class="user-info">
                 <p><strong><span style="font-size: 1.4em;">User:</span></strong><span style="font-size: 1.4em;"> ${user.firstname} ${user.lastname}</span></p>
-                <p><strong><span style="font-size: 1.4em;">Registration Date:</span></strong><span style="font-size: 1.4em;"> DATE</span></p>
+                <p><strong><span style="font-size: 1.4em;">Registration Date:</span></strong><span style="font-size: 1.4em;"> ${user.registration_date.toString()}</span></p>
                 <!-- Replace with the actual registration date format you use -->
             </div>
 
