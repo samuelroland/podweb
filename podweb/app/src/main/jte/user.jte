@@ -8,47 +8,45 @@
 @param ArrayList<Badge> badges
 @param ArrayList<Playlist> playlists
 
-    @template.layout(
+@template.layout(
     content = @`
-    
         <div class="container mx-auto my-8">
             <h1 class="text-3xl font-bold text-center mb-6">${user.firstname}'s Profile</h1>
 
             <!-- Display user information -->
-            <div class="user-info">
-                <p><strong><span style="font-size: 1.4em;">User:</span></strong><span style="font-size: 1.4em;"> ${user.firstname} ${user.lastname}</span></p>
-                <p><strong><span style="font-size: 1.4em;">Registration Date:</span></strong><span style="font-size: 1.4em;"> ${user.registration_date.toString()}</span></p>
-                <!-- Replace with the actual registration date format you use -->
+            <div class="user-info text-lg mb-6">
+                <p><strong>User:</strong> ${user.firstname} ${user.lastname}</p>
+                <p><strong>Registration Date:</strong> ${user.registration_date.toString()}</p>
             </div>
 
-            <!-- User Information Section -->
-            <div class="user-info mb-6">
-                <h2 class="text-2xl font-semibold">Badges</h2>
+            <!-- User Badges Section -->
+            <div class="user-badges mb-8">
+                <h2 class="text-2xl font-semibold mb-4">Badges</h2>
                 <!-- Display user badges -->
-                <div class="badges">
+                <ul class="space-y-4">
                     @for(Badge badge : badges)
-                        <li class="p-4 bg-white rounded-md shadow-md flex justify-between items-center">
-                        <div class="podcast-info flex-grow mx-4">
-                            <h2 class="text-lg font-semibold">${badge.name}</h2>
-                            <h4 class="text-lg">$unsafe{badge.description}</h4>
-                            <h4 class="text-lg">${badge.point}</h4>
-                        </div>
+                        <li class="p-4 bg-white rounded-md shadow-md">
+                            <div class="badge-info">
+                                <h2 class="text-lg font-semibold">${badge.name}</h2>
+                                <p class="text-gray-600">${badge.description}</p>
+                                <p class="text-gray-600">Points: ${badge.point}</p>
+                            </div>
                         </li>
                     @endfor
-                </div>
+                </ul>
             </div>
 
-            <!-- Playlists Section -->
-            <div class="playlists">
-                <h2 class="text-2xl font-semibold">Playlists</h2>
+            <!-- User Playlists Section -->
+            <div class="user-playlists">
+                <h2 class="text-2xl font-semibold mb-4">Playlists</h2>
                 <ul class="space-y-4">
                     <!-- Display user playlists -->
                     @for(Playlist playlist : playlists)
-                        <li class="p-4 bg-white rounded-md shadow-md flex justify-between items-center">
-                        <div class="podcast-info flex-grow mx-4">
-                            <h2 class="text-lg font-semibold">${playlist.name}</h2>
-                            <h4 class="text-lg">$unsafe{playlist.description}</h4>
-                        </div>
+                        <li class="p-4 bg-white rounded-md shadow-md">
+                            <div class="playlist-info">
+                                <h2 class="text-lg font-semibold">${playlist.name}</h2>
+                                <p class="text-gray-600">${playlist.description}</p>
+                            </div>
                         </li>
                     @endfor
                 </ul>
@@ -56,4 +54,4 @@
         </div>
     `,
     loggedUser
-    )
+)
