@@ -2,11 +2,20 @@ package podweb.models;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public abstract class Model<T> {
     public int id;
+    private static String[] defaultKeys = new String[] { "id" };
 
     abstract public String table();
+
+    public String[] intPrimaryKeys() {
+        return defaultKeys;
+    }
 
     public static Podcast o = new Podcast();
 
@@ -17,6 +26,7 @@ public abstract class Model<T> {
         return getQuery().query(query);
     }
 
+    // Get By -> useful to filter table entries by one or more integer fields
     public ArrayList<T> getBy(String foreignKey, int id) {
         String query = "select * from " + table()
                 + " where " + foreignKey + " = ? ;";
@@ -36,6 +46,7 @@ public abstract class Model<T> {
         return getQuery().query(query, ids);
     }
 
+    // Get first by -> like Get By but only gives the first element
     public T getFirstBy(String[] foreignKeys, Integer[] ids) {
         ArrayList<T> list = getBy(foreignKeys, ids);
         if (!list.isEmpty()) {
@@ -52,6 +63,7 @@ public abstract class Model<T> {
         return null;
     }
 
+    // Really useful ??
     public ArrayList<T> getBy(String foreignKey, Object o) {
         return getBy(foreignKey, new Object[] { o });
     }
@@ -70,26 +82,42 @@ public abstract class Model<T> {
         return null;
     }
 
+    // Find (by id or by other key fields)
     public T find(int id) {
-        ArrayList<T> list = getQuery().query("select * from " + table()
-                + " where id = ?", new Object[] { id });
+        makeSureEntityUsesIdField();
+        return find("where id = ?", new Object[] { id });
+    }
+
+    public T find(Map<String, Integer> fields) {
+        return find(buildWhereClauseWithKeysMap(fields), valuesOrderedByKey(fields));
+    }
+
+    private T find(String whereClause, Object[] values) {
+        String query = "select * from " + table() + " " + whereClause;
+
+        ArrayList<T> list = getQuery().query(query, values);
+        System.out.println("list " + list);
         if (list != null && list.size() == 1) {
             return list.getFirst();
         }
         return null;
     }
 
+    // Exists (whether find() returns null)
     public boolean exists(int id) {
-        // TODO: check sql exists performant way
-        ArrayList<T> list = getQuery().query("select 1 from " + table() +
-                " where id = ?", new Object[] { id });
-        return (list != null && list.size() == 1);
+        return find(id) != null;
     }
 
+    public boolean exists(Map<String, Integer> fields) {
+        return find(fields) != null;
+    }
+
+    // Simple table count
     public int count() {
         return Query.count(table());
     }
 
+    // Create an element with attributes on the current object
     public boolean create() {
         String query = "insert into " + table() + " (";
 
@@ -118,25 +146,42 @@ public abstract class Model<T> {
         return true;
     }
 
+    // Update all attributes of current object in DB
+    // It does not update any key fields (in intPrimaryKeys())
     public boolean update() {
         String query = "UPDATE " + table() + "\nSET ";
 
         String attributes = "";
         int i = 0;
+        ArrayList<Object> values = new ArrayList<>(5);
+        Set<String> excludeKeys = new HashSet<String>();
+        // excludeKeys.addAll(intPrimaryKeys());
+
+        // excludeKeys.add("id");
+        // excludeKeys.add("o");
+        // excludeKeys.add("q");
         for (Field field : getQuery().ref.getFields()) {
-            if ((field.getName().equals("id") || field.getName().equals("o") || field.getName().equals("q")))
+            if (excludeKeys.contains(field.getName()))
                 continue;
 
             if (i > 0) {
                 attributes += ", ";
             }
             attributes += field.getName() + " = ?";
+            try {
+                values.add(field.get(this));
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             i++;
         }
         query += attributes + "\nWHERE id = ?";
+        values.add(this.id);
         // TODO: specify ID !!!
         System.out.println(query);
-        int nb = getQuery().update(query, this);
+        int nb = getQuery().update(query, values.toArray());
         return nb == 1;
     }
 
@@ -144,4 +189,51 @@ public abstract class Model<T> {
         return getQuery().update("delete from " + table()
                 + " where id = ?", new Object[] { id }) == 1;
     }
+
+    // --- Private helpers for various operations
+
+    // Given a map of int indexed by string like {"user_id": 2, "episode_id": 3}
+    // it will check that all required keys for this entity (returned by
+    // intPrimaryKeys()) are present in the map
+    // It will then return the where clause "where user_id = ? and episode_id = ?"
+    private String buildWhereClauseWithKeysMap(Map<String, Integer> fields) {
+        String queryPart = "where ";
+        int count = 0;
+        String[] keys = intPrimaryKeys();
+        for (String key : keys) {
+            if (!fields.containsKey(key))
+                throw new RuntimeException(
+                        "Model.buildWhereClauseWithKeysMap(): field "
+                                + key + " not found in given Map but necessary to find a unique element on " + table());
+            if (count++ > 0) {
+                queryPart += " and ";
+            }
+            queryPart += key + " = ?";
+        }
+
+        return queryPart;
+    }
+
+    // Returns a list of values read from the given map
+    // in the order defined by intPrimaryKeys()
+    // This makes sure we have the same order that buildWhereClauseWithKeysMap()
+    private Object[] valuesOrderedByKey(Map<String, Integer> fields) {
+        ArrayList<Object> values = new ArrayList<>();
+        for (String key : intPrimaryKeys()) {
+            values.add(fields.get(key));
+        }
+        return values.toArray();
+    }
+
+    // Make sure the current uses the id field as a primary key
+    // Useful to catch code error when using wrong methods
+    private void makeSureEntityUsesIdField() {
+        // Checking we don't use this method in case the primary key is not "id"
+        String[] keys = intPrimaryKeys();
+        if (keys.length == 0 || !keys[0].equals("id")) {
+            throw new RuntimeException(
+                    "Using Model.find() on model without an 'id' is not possible. Use the Map variant.");
+        }
+    }
+
 }

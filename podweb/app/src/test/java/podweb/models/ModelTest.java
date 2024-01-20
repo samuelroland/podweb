@@ -6,18 +6,19 @@ package podweb.models;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.javalin.Javalin;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.assertj.core.api.Assertions.*;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ModelTest {
     static Query<Podcast> q = new Query<>(Podcast.class);
@@ -38,6 +39,41 @@ public class ModelTest {
         assertNotNull(podcasts);
         assertEquals(35, podcasts.size());
         assertEquals("LJDS Le Journal Des Stratèges", podcasts.getFirst().title);
+    }
+
+    @Test
+    public void model_find_works_on_table_without_default_id() {
+        Queue q = Queue.o.find(Map.of("episode_id", 87, "user_id", 36));
+        assertNotNull(q);
+        assertEquals(87, q.episode_id);
+        assertEquals(36, q.user_id);
+        assertEquals(0, q.index);
+
+        // Inverted fields order
+        assertNotNull(Queue.o.find(Map.of("user_id", 36, "episode_id", 87)));
+
+        // Non existant queue record
+        assertNull(Queue.o.find(Map.of("user_id", 22, "episode_id", 222)));
+    }
+
+    @Test
+    public void model_find_fails_on_table_without_all_non_ids_keys() {
+        // Wrong method
+        assertThrows(RuntimeException.class, () -> {
+            Queue q = Queue.o.find(87);
+        });
+
+        assertThrows(RuntimeException.class, () -> {
+            Queue q = Queue.o.find(Map.of("episode_id", 87));
+        });
+
+        assertThrows(RuntimeException.class, () -> {
+            Queue q = Queue.o.find(Map.of("user_id", 87));
+        });
+
+        // No exception when just not found
+        Queue q = Queue.o.find(Map.of("episode_id", 8237, "user_id", 32236));
+        assertNull(q);
     }
 
     @Test
@@ -65,6 +101,18 @@ public class ModelTest {
     }
 
     @Test
+    public void model_exists_works_with_table_without_id() {
+        assertTrue(Queue.o.exists(Map.of("user_id", 36, "episode_id", 87)));
+        assertTrue(Queue.o.exists(Map.of("episode_id", 87, "user_id", 36))); // inverted fields order
+        assertTrue(Queue.o.exists(Map.of("user_id", 38, "episode_id", 4157)));
+
+        assertFalse(Queue.o.exists(Map.of("user_id", 87, "episode_id", 36))); // inverted values
+        assertFalse(Queue.o.exists(Map.of("user_id", 36, "episode_id", 111111)));
+        assertFalse(Queue.o.exists(Map.of("user_id", 2322336, "episode_id", 87)));
+        assertFalse(Queue.o.exists(Map.of("user_id", 0, "episode_id", 0)));
+    }
+
+    @Test
     public void model_create_correctly_create_element() {
         int pCount = Podcast.o.count();
 
@@ -76,9 +124,10 @@ public class ModelTest {
         p.image = "image.png";
         p.author = "me";
         p.episodes_count = 200;
-        // assertEquals(35, Podcast.o.all().size());
+        assertEquals(35, Podcast.o.all().size());
         assertTrue(p.create());
         assertNotNull(p.id);
+        System.out.println(p);
         assertNotEquals(0, p.id);
 
         assertEquals(pCount + 1, Podcast.o.count());
@@ -128,7 +177,7 @@ public class ModelTest {
     }
 
     @Test
-    public void model_update_works() {
+    public void model_update_works_on_table_with_id() {
         Podcast p = Podcast.o.find(27);
         assertEquals("Underscore_", p.title);
         p.title = "THE LIVE !";
@@ -136,6 +185,18 @@ public class ModelTest {
         Podcast p2 = Podcast.o.find(27);
         assertNotNull(p2);
         assertEquals("THE LIVE !", p2.title);
+    }
+
+    @Test
+    public void model_update_works_on_table_without_default_id() {
+        Queue q = Queue.o.find(1);
+        int startIndex = q.index;
+
+        q.index++;
+        assertTrue(q.update());
+        assertEquals(startIndex + 1, q.index);
+        Queue newQ = Queue.o.find(1);
+        assertEquals(startIndex + 1, newQ.index);
     }
 
     // TODO: test and implement updating classes with other unique fields than id
