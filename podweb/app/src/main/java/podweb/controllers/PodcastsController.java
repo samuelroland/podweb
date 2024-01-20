@@ -49,7 +49,8 @@ public class PodcastsController {
     }
 
     public void ranking(Context ctx){
-
+        ArrayList<Podcast> p = Podcast.ranking();
+        ctx.render("ranking.jte", Map.of("loggedUser", App.loggedUser(ctx), "rankedPodcasts", p));
     }
 
     public void comments(Context ctx){

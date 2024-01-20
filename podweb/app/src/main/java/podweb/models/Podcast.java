@@ -1,5 +1,7 @@
 package podweb.models;
 
+import java.util.ArrayList;
+
 public class Podcast extends Model<Podcast> {
     public int id;
     public String title;
@@ -24,5 +26,11 @@ public class Podcast extends Model<Podcast> {
 
     public String toString() {
         return id + " " + title + " " + author;
+    }
+
+
+    public static ArrayList<Podcast> ranking(){
+        String query = "select * from podcasts_ranking;";
+        return q.query(query);
     }
 }
