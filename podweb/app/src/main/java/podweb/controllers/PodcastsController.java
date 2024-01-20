@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import io.javalin.http.Context;
 
@@ -57,14 +58,34 @@ public class PodcastsController {
     public void comments(Context ctx) {
         try {
             Episode e = Episode.o.find(Integer.parseInt(ctx.pathParam("id")));
-            ArrayList<Comment> comments = Comment.o.getBy("episode_id", e.id);
-            ArrayList<Integer> userIds = new ArrayList<>(comments.size());
-            for (var comment : comments) {
-                userIds.add(comment.user_id);
+            if (e == null) {
+                ctx.render("Episode not found");
+                return;
             }
-            Map<Integer, User> authors = User.o.getByIdList(userIds);
+
+            //Get the episodes grouped by parent_id
+            ArrayList<Comment> comments = Comment.getByEpisodesSortedByParentFirst(e.id);
+
+            // Only manage comments and search authors if they are found
+            Map<Integer, User> authors = new TreeMap<>();
+            Map<Integer, Integer> commentsLevelById = new TreeMap<>();
+            if (!comments.isEmpty()) {
+                ArrayList<Integer> userIds = new ArrayList<>(comments.size());
+                for (var comment : comments) {
+                    userIds.add(comment.user_id);
+
+                    // Calculate the level of each comment (level is 1 if parent_id == null, otherwise "parent level + 1")
+                    commentsLevelById.put(comment.id,
+                            comment.parent_id != null
+                                    && commentsLevelById.containsKey(comment.parent_id)
+                                            ? commentsLevelById.get(comment.parent_id) + 1
+                                            : 1);
+                }
+                authors = User.o.getByIdList(userIds);
+            }
             ctx.render("comment.jte",
-                    Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", comments, "authors", authors));
+                    Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", comments, "authors", authors,
+                            "commentsLevelById", commentsLevelById));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }
