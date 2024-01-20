@@ -57,7 +57,7 @@ public class App {
         // Episodes related routes (mostly comments)
         app.get("/episodes/{id}/comments", podcastsController::comments);
         app.post("/episodes/{id}/comments", podcastsController::addComment);
-        app.delete("/episodes/{id1}/comments/{id2}", podcastsController::deleteComment);
+        app.post("/comments/{id}/delete", podcastsController::deleteComment);
 
         // Auth routes
         UsersController usersController = new UsersController();
@@ -131,6 +131,10 @@ public class App {
         if (possibleUser == null)
             return 1; // just not a user as Map.of doesn't support null values
         return (User) possibleUser;
+    }
+
+    public static boolean logged(Context ctx) {
+        return App.loggedUser(ctx) instanceof User;
     }
 
     public static boolean isProduction() {

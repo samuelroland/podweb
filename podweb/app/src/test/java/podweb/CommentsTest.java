@@ -56,8 +56,10 @@ public class CommentsTest {
     @Test
     public void comments_can_create_a_comment() {
         JavalinTest.test(app, (server, client) -> {
+            AppTest.actingAs(1);
             var cCount = Comment.o.count();
-            var res = client.post("/episodes/1/comments", "content=heythere&note=5&episode_id=1&user_id=1&parent_id=1");
+            var res = client.post("/episodes/1/comments", "content=heythere&note=5&episode_id=1&user_id=1");
+            assertThat(res.body().string()).doesNotContain("Failed to create comment");
             assertEquals(200, res.code());
             var res2 = client.get("/episodes/1/comments");
             assert res2.body() != null;
@@ -67,11 +69,27 @@ public class CommentsTest {
 
             assertEquals(cCount + 1, Comment.o.count());
 
-            // Ne fonctionne plus comme il le faut, ne donne pas le dernier commentaire???
+            var newComment = Comment.o.getBy("episode_id", 1).getLast();
+            assertEquals(newComment.content, "heythere");
+            assertEquals(5, newComment.note);
+            assertEquals(null, newComment.parent_id);
+            assertThat(newComment.date).isEqualTo(System.currentTimeMillis());
+        });
+    }
 
-            // var newComment = Comment.o.getBy("episode_id", 1).getLast();
-            // assertEquals(newComment.content, "heythere");
-            // assertEquals(5, newComment.note);
+    @Test
+    public void comments_can_create_a_comment_as_a_reply() {
+        JavalinTest.test(app, (server, client) -> {
+            var cCount = Comment.o.count();
+            var res = client.post("/episodes/1/comments", "content=heythere&note=5&episode_id=1&user_id=1&parent_id=1");
+            assertThat(res.body().string()).doesNotContain("Failed to create comment");
+            assertEquals(200, res.code());
+            assertEquals(cCount + 1, Comment.o.count());
+
+            var newComment = Comment.o.getBy("episode_id", 1).getLast();
+            assertEquals(newComment.content, "heythere");
+            assertEquals(5, newComment.note);
+            assertEquals(1, newComment.parent_id);
         });
     }
 
@@ -79,7 +97,7 @@ public class CommentsTest {
     public void comments_can_delete_a_comment() {
         JavalinTest.test(app, (server, client) -> {
             var cCount = Comment.o.count();
-            var res = client.delete("/episodes/1/comments/1");
+            var res = client.delete("/comments/1");
             assertEquals(200, res.code());
             // Doit faire -2 pour je ne sais quelle raison, est ce qu'on duplique les
             // commentaires??

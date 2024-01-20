@@ -1,6 +1,8 @@
 package podweb.models;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class Comment extends Model<Comment> {
@@ -32,5 +34,11 @@ public class Comment extends Model<Comment> {
     public static ArrayList<Comment> getByEpisodesSortedByParentFirst(int episodeId) {
         String query = "SELECT * FROM comments WHERE episode_id = ? ORDER BY CASE WHEN parent_id IS NULL THEN id ELSE parent_id END, id";
         return q.query(query, new Object[] { episodeId });
+    }
+
+    public String date() {
+        // https://stackoverflow.com/questions/41144296/how-to-convert-timestamp-to-appropriate-date-format
+        DateFormat f = new SimpleDateFormat("dd.MM.YY HH:mm");
+        return f.format(date);
     }
 }

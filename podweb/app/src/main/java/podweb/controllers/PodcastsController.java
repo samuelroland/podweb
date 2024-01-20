@@ -48,7 +48,7 @@ public class PodcastsController {
             }
             ctx.render("resultSearch.jte",
                     Map.of("loggedUser", App.loggedUser(ctx), "episodes", episodes, "query",
-                            query == null ? "" : query));
+                            query == null ? "" : query.trim()));
         } catch (NumberFormatException e) {
             ctx.status(404);
         } catch (SQLException e) {
@@ -90,7 +90,7 @@ public class PodcastsController {
                 }
                 authors = User.o.getByIdList(userIds);
             }
-            ctx.render("comment.jte",
+            ctx.render("comments.jte",
                     Map.of("loggedUser", App.loggedUser(ctx), "episode", e, "comments", comments, "authors", authors,
                             "commentsLevelById", commentsLevelById));
         } catch (NumberFormatException e) {
@@ -99,30 +99,43 @@ public class PodcastsController {
     }
 
     public void addComment(Context ctx) {
+        if (!App.logged(ctx)) {
+            ctx.render("Logged out, cannot comment.");
+            return;
+        }
         Comment comment = new Comment();
         comment.content = ctx.formParam("content");
-        comment.note = Integer.parseInt(Objects.requireNonNull(ctx.formParam("note")));
+        if (ctx.formParam("note") != null && !ctx.formParam("note").trim().isEmpty()) {
+            comment.note = Integer.parseInt(Objects.requireNonNull(ctx.formParam("note")));
+        } else {
+            comment.note = 0;
+        }
         comment.episode_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("episode_id")));
-        comment.user_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("user_id")));
-        comment.parent_id = Integer.parseInt(Objects.requireNonNull(ctx.formParam("parent_id")));
+        comment.user_id = ((User) App.loggedUser(ctx)).id;
+        comment.parent_id = null;
+        if (ctx.formParam("parent_id") != null && !ctx.formParam("parent_id").trim().isEmpty()) {
+            comment.parent_id = Integer.parseInt(ctx.formParam("parent_id"));
+        }
         comment.date = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
         // comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
-
+        System.out.println(comment);
         if (comment.create()) {
-            ctx.status(200);
+            ctx.redirect("/episodes/" + comment.episode_id + "/comments");
         } else {
-            ctx.status(500);
+            ctx.result("Failed to create comment...");
         }
 
     }
 
     public void deleteComment(Context ctx) {
         try {
-            int id = Integer.parseInt(ctx.pathParam("id2"));
-            if (Comment.o.deleteById(id)) {
-                // todo: back to previous page
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            Comment comment = Comment.o.find(id);
+            if (comment.delete()) {
+                ctx.redirect("/episodes/" + comment.episode_id + "/comments");
             } else {
-                // todo: previous page with error message
+                ctx.status(400);
+                ctx.redirect("/episodes/" + comment.episode_id + "/comments");
             }
         } catch (NumberFormatException e) {
             System.err.println(e);

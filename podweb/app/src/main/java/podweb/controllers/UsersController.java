@@ -23,8 +23,6 @@ public class UsersController {
         User user = User.o.getFirstBy("email", email);
         boolean validPwd = false;
 
-        System.out.println("email " + email);
-        System.out.println("pwd " + password);
         if (user != null && password != null) {
             validPwd = password.equals(user.password);
         }
