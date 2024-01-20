@@ -73,7 +73,7 @@ public abstract class Model<T> {
     public T find(int id) {
         ArrayList<T> list = getQuery().query("select * from " + table()
                 + " where id = ?", new Object[] { id });
-        if (list != null) {
+        if (list != null && list.size() == 1) {
             return list.getFirst();
         }
         return null;

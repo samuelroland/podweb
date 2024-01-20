@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.assertj.core.api.Assertions.*;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class ModelTest {
@@ -104,6 +105,26 @@ public class ModelTest {
         assertNotNull(queueItem.getFirstBy(new String[] { "user_id", "episode_id" }, new Integer[] { 12, 322 }));
 
         assertEquals(qCount + 1, Queue.o.count());
+    }
+
+    @Test
+    public void model_create_correctly_create_element_with_null_value() {
+        int cCount = Comment.o.count();
+
+        Comment c = new Comment();
+        c.content = "haha";
+        c.note = 12;
+        c.date = new Timestamp(System.currentTimeMillis());
+        c.user_id = 2;
+        c.episode_id = 1;
+
+        assertTrue(c.create());
+        assertNotNull(c.id);
+        System.out.println("set id c.id: " + c.id);
+        var foundComment = Comment.o.find(c.id);
+        assertNotNull(foundComment);
+        assertEquals(foundComment.content, "haha");
+        assertEquals(cCount + 1, Comment.o.count());
     }
 
     @Test

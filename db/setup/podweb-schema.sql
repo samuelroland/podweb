@@ -20,7 +20,7 @@ CREATE TABLE users (
   lastname VARCHAR(100) NOT NULL,
   email VARCHAR(254) NOT NULL,
   password VARCHAR(255) NOT NULL,
-  registration_date TIMESTAMPTZ NOT NULL,
+  registration_date TIMESTAMP NOT NULL,
   CONSTRAINT email_unique UNIQUE (email)
 );
 
@@ -57,7 +57,7 @@ CREATE TABLE episodes (
   title VARCHAR(250) NOT NULL,
   description TEXT,
   duration INT NOT NULL,
-  released_at TIMESTAMPTZ NOT NULL,
+  released_at TIMESTAMP NOT NULL,
   audio_url VARCHAR(2000) NOT NULL,
   podcast_id INT NOT NULL,
   CONSTRAINT audio_url_unique UNIQUE (audio_url),
@@ -151,7 +151,7 @@ CREATE TABLE comments (
   id SERIAL,
   note SMALLINT NOT NULL,
   content TEXT,
-  date TIMESTAMPTZ NOT NULL,
+  date TIMESTAMP NOT NULL,
   user_id INT NOT NULL,
   parent_id INT,
   episode_id INT NOT NULL,

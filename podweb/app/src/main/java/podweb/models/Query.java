@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -170,23 +171,35 @@ public class Query<T> {
         return -1;
     }
 
-    private static void applyParamsOnStatement(PreparedStatement statement, Object[] list)
-            throws SQLException {
+    private static void applyParamsOnStatement(PreparedStatement statement, Object[] list) {
         System.out.println("applyParamsOnStatement() Params: ");
         for (Object object : list) {
             System.out.println(object);
         }
         int cnt = 1;
-        for (Object object : list) {
-            if (object instanceof Integer o) {
-                statement.setInt(cnt++, o);
+        try {
+
+            for (Object object : list) {
+                System.out.println("obj apply " + object);
+                if (object == null) {
+                    statement.setNull(cnt++, java.sql.Types.NULL);
+                }
+                if (object instanceof Integer o) {
+                    statement.setInt(cnt++, o);
+                } else if (object instanceof Double o) {
+                    statement.setDouble(cnt++, o);
+                } else if (object instanceof String o) {
+                    statement.setString(cnt++, o);
+                } else if (object instanceof Timestamp o) {
+                    System.out.println("found date ! " + cnt);
+                    // statement.setString(cnt++, o.toString());
+                    statement.setTimestamp(cnt++, o);
+                } else if (object instanceof Object o) {
+                    statement.setObject(cnt++, o);
+                }
             }
-            if (object instanceof Double o) {
-                statement.setDouble(cnt++, o);
-            }
-            if (object instanceof String o) {
-                statement.setString(cnt++, o);
-            }
+        } catch (Exception e) {
+            System.out.println("apply exceptions: " + e);
         }
     }
 
@@ -198,6 +211,7 @@ public class Query<T> {
                     continue;
                 field.setAccessible(true);
                 list.add(field.get(object));
+                System.out.println("added to object: " + list);
             }
         } catch (Exception e) {
             System.out.println("Query object to map error: " + e);

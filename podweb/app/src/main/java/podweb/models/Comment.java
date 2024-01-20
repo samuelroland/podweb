@@ -3,7 +3,6 @@ package podweb.models;
 import java.sql.Timestamp;
 
 public class Comment extends Model<Comment>{
-    public int id;
     public int user_id;
     public int episode_id;
     public Integer parent_id;
