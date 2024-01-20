@@ -164,7 +164,7 @@ CREATE TABLE comments (
   CONSTRAINT fk_comments_comments1
       FOREIGN KEY (parent_id)
           REFERENCES comments (id)
-          ON DELETE NO ACTION
+          ON DELETE CASCADE
           ON UPDATE NO ACTION,
   CONSTRAINT fk_comments_episodes1
       FOREIGN KEY (episode_id)
