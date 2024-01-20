@@ -3,7 +3,6 @@
  */
 package podweb;
 
-import java.io.File;
 import java.nio.file.Path;
 
 import gg.jte.ContentType;
@@ -40,7 +39,7 @@ public class App {
         // folder in production
         Javalin app = Javalin.create(config -> {
             String folder = "src/main/static";
-            if (System.getenv("PODWEB_PRODUCTION") != null) {
+            if (App.isProduction()) {
                 folder = "static";
             }
             config.staticFiles.add(folder, Location.EXTERNAL);
