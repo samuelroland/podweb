@@ -1,7 +1,5 @@
 package podweb.models;
 
-import java.util.ArrayList;
-
 public class Podcast extends Model<Podcast> {
     public int id;
     public String title;

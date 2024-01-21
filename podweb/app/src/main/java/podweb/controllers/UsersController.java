@@ -6,10 +6,7 @@ import java.util.Map;
 import io.javalin.http.Context;
 import podweb.App;
 import podweb.models.Badge;
-import podweb.models.Episode;
-import podweb.models.Obtain;
 import podweb.models.Playlist;
-import podweb.models.Podcast;
 import podweb.models.User;
 
 public class UsersController {

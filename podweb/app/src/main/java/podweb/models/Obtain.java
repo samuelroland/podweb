@@ -1,8 +1,5 @@
 package podweb.models;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 public class Obtain extends Model<Obtain>{
     int badge_id;
     int user_id;

@@ -12,16 +12,6 @@ public class RankedPodcast{
     
     private static Query<RankedPodcast> q = new Query<>(RankedPodcast.class);
 
-    public RankedPodcast(){}
-
-    public RankedPodcast(int id, String title, String image, String author, BigDecimal listenings_total){
-        this.id = id;
-        this.title = title;
-        this.image = image;
-        this.author = author;
-        this.listenings_total = listenings_total;
-    }
-
     public static ArrayList<RankedPodcast> ranking(){
         String query = "select * from podcasts_ranking;";
         return q.query(query);

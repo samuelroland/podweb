@@ -3,8 +3,6 @@ package podweb.models;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import podweb.App;
-
 public class Episode extends Model<Episode> {
     public int id;
     public String title;

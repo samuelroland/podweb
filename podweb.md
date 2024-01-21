@@ -3,10 +3,9 @@ Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
 <!-- TODO : faire une jolie page de titre avec saut de page ! -->
 <!-- TODO : inclure photo de l'app sur la page de titre ! -->
 <!-- TODO : faire un joli export -->
-<img src="PodWebLogo.png" width="500" height="500" alt="Logo de podweb">
+<img src="Images/PodWebLogo.png" width="500" height="500" alt="Logo de podweb">
 
 <p style="page-break-before: always"></p>
-
 
 ## Introduction
 
@@ -43,9 +42,15 @@ Notre application web permet de faire les choses suivantes :
 
 La page d'accueil affiche tous les podcasts avec leur image, titre, auteurs et nombres d'épisodes.
 Les boutons en haut de la page nous permettent de se déplacer dans les autres vues décrites par ces boutons.
-Si l'on est connécté notre nom d'utilisateur est affiché à côté du bouton `Login` et il est possible de cliquer dessus
+Si l'on est connecté notre nom d'utilisateur est affiché à côté du bouton `Login` et il est possible de cliquer dessus
 pour accéder à notre page d'utilisateur.
 Cliquer sur un podcast nous amène à la page qui affiche les détails de celui-ci.
+
+![Capture d'écran de la page d'accueil](Images/MainPage_podcasts_cap.png)
+
+La page d'accueil une fois connecté
+
+![Capture d'écran de la page d'accueil connecté](Images/MainPage_logged_podcasts_cap.png)
 
 ### Détail d'un podcast
 
@@ -54,12 +59,20 @@ On peut y voir l'image du podcast en question et une liste de tous les épisodes
 
 On peut ensuite cliquer sur l'un des épisodes que l'on veut écouter, soit sur le nom en lui-même ou bien en cliquant sur l'icône play à côté du titre.
 
+![Détails d'un podcast](Images/PodcastDetails_podcast_cap.png)
+
 ### Detail d'un épisode
 
 L'affichage d'un podcast se fait par l'affichage de son nom, sa description et sa durée.
 C'est ici qu'on peut écouter un épisode avec un simple lecteur audio et également voir les commentaires et les notes liés celui-ci.
 Si on est connecté, on peut aussi voir le nombre d'écoutes que l'on a pour cet épisode et 
 nous même commenter, noter l'épisode et répondre à d'autres commentaires.
+
+![Détails d'un épisode](Images/EpisodeDetails_episode_cap.png)
+
+La page d'un épisode une fois connecté
+
+![Détails d'un épisode connecté](Images/EpisodeDetails_logged_episode_cap.png)
 
 ### Ranking
 
@@ -68,6 +81,8 @@ On y voit une liste qui classe les podcasts par leur nombre d'écoutes.
 Chaque podcast a son titre, son image, son auteur et son nombre d'écoutes affiché.
 On peut toujours cliquer sur l'un deux pour accéder à ses détails.
 
+![Classement des podcasts](Images/Ranking_cap.png)
+
 ### Recherche
 
 À tout moment, on peut cliquer sur le bouton `Search` en haut de la page pour accéder à la page de recherche.
@@ -75,15 +90,33 @@ On peut y rechercher des épisodes en fonction de leur titre, description, auteu
 
 On obtient alors une liste d'épisodes qui correspondent à la recherche suivie d'une description du podcast lié à celui-ci et une image du podcast. On peut cliquer sur un épisode pour accéder à sa page de détail ou bien, on peut cliquer sur le podcast correspondant à l'épisode pour arriver sur la page de détail d'un podcast.
 
+Une recherche réussite
+
+![Recherche trouvée](Images/Search_found_cap.png)
+
+Une recherche sans résultats
+
+![Recherche sans résultats](Images/Search%20_no_result_cap.png)
+
+### Page de connection
+
+Cette page nous permet de nous connecter en tant qu'utilisateur de podweb.
+
+![Connection](Images/Login_cap.png)
+
 ### Liste d'utilisateurs
 
 La page `Users` (lien : `/users`) permet de lister tous les utilisateurs de *Podweb*.
 On peut cliquer sur chaque utilisateur afin d'accéder à leur page.
 
+![Utilisateurs](Images/Users_cap.png)
+
 ### Page utilisateur
 
 La page utilisateur affiche le nom et prénom de l'utilisateur choisi, sa date d'inscription, la liste des badges qu'il a 
 obtenues et la liste des playlists qu'il a créées.
+
+![Page d'utilisateur](Images/Profile_cap.png)
 
 ## Implémentation
 
@@ -100,7 +133,7 @@ données. Pour d'éventuelles futures améliorations.
 ### Java stack
 Voici les outils que nous utilisons pour implémenter notre application web en Java :
 1. Javalin : un petit framework web léger et rapide
-2. Gradle : nous voulions tester autre chose que Maven pour gérer les dépendences, les builds et l'exécution de tests, nous avons pris son alternative.
+2. Gradle : nous voulions tester autre chose que Maven pour gérer les dépendances, les builds et l'exécution de tests, nous avons pris son alternative.
 3. [JTE](https://jte.gg/) : système de template permettant d'écrire facilement des vues en HTML
 4. TailwindCSS : un framework CSS très puissant et orienté sur des classes utilitaires
 5. JUnit : le classique framework de test en Java
@@ -166,13 +199,23 @@ Nous avons implémenté les opérations CRUD dans ces situations :
 
 ### Triggers : 
 
-Nous utilisons les triggers seulement dans le cas de mise à jour des badges. Lorsque nous, par exemple, postons plus de 10 messages. Donc à chaque insertion de nouveau message dans la base de donnée, le trigger va vérifier si nous avons atteint le nombre de messages requis pour obtenir le badge. Si c'est le cas, il va l'ajouter à notre liste de badges.
+Les triggers sont utilisés pour donner des badges aux utilisateurs. Chaque condition est spécifique à chaque type de badge.
 
-On fait de même avec le nombre d'écoutes.
+Donc les badges qui sont basés sur le nombre d'écoute n'aura pas le même trigger que celui des commentaires.
+
+Nous en avons défini 4 en tout mais finalement utilisé que 2 (ceux cités au-dessus). Nous ne savions pas quand le trigger pour temps d'inscription devait se faire et comme la gestion de playlists n'a pas été faite nous ne pouvons pas utilisé celui du badge des playlists.
+
+Celui du badge des commentaires se déclenche quand une nouveau commentaire est posté et vérifie si l'utilisateur qui l'a posté à dépassé une des conditions des badges de ce type.
+
+Celui du nombre d'écoute se déclenche quand une nouvelle écoute est enregistrée pour un utilisateur continue de la même manière que celui plus-haut.
 
 ### Vues
 
 Nous utilisons les vues dans notre classement afin de savoir le nombre total d'écoutes qu'a chaque podcast.
+
+La vue `episodes_ranking` liste tous les épisode avec leur nombre d'écoutes respectif et les tries selon celui-ci.
+
+La vue `podcasts_ranking` utilise la vue précédente pour récupérer le nombre d'écoute total par podcast et les trier par celui-ci.
 
 ## Développement
 

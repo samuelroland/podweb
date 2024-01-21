@@ -1,25 +1,16 @@
 package podweb.controllers;
 
 import podweb.App;
-import podweb.models.Comment;
 import podweb.models.Episode;
 import podweb.models.EpisodeSearch;
 import podweb.models.Podcast;
 import podweb.models.RankedPodcast;
-import podweb.models.User;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
 
 import io.javalin.http.Context;
-
-import static java.lang.Integer.valueOf;
 
 public class PodcastsController {
 
