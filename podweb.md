@@ -1,22 +1,68 @@
 # Podweb
+Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
 <!-- TODO: faire une joli page de titre avec saut de page ! -->
 <!-- TODO: inclure photo de l'app sur la page de titre ! -->
 <!-- TODO: faire un joli export -->
+<img src="PodWebLogo.png" width="500" height="500" alt="Logo de podweb">
 
-## Java stack
-Voici les outils que nous utilisons pour implémenter noter application web en Java:
+<p style="page-break-before: always"></p>
+
+
+## Introduction
+
+Dans le cadre du cours de base de données relationnelles, nous avons réalisé un projet de développement d'une
+application web en Java permettant d'écouter et d'interagir avec des podcasts, ajouter des commentaires,
+des notes, etc.
+
+## Fonctionnalités
+
+Notre application web permet de faire les choses suivantes :
+
+1. Parcours des podcasts et de leurs épisodes. On peut voir l'image des podcasts, le nombre d'épisodes publiés ainsi que leur auteur.
+
+2. Recherche fulltext des épisodes (titre, description, auteur, titre du podcast) et affichage des résultats.
+
+3. Ranking des podcasts les plus écoutés
+
+4. Lors de l'écoute d'un épisode, l'application sauvegarde toutes les 15 secondes la progression de l'écoute dans la base de données.
+   Permet de reprendre l'écoute là où on s'était arrêté.
+
+5. Possibilité de se connecter avec des identifiants déjà existants pour pouvoir commenter et noter les épisodes et sauvegarder les progressions
+   d'écoute.
+
+6. Commenter les épisodes et répondre à d'autres commentaires.
+
+7. Possibilité de voir son profil et les badges obtenus (badges d'écoute, de commentaires, etc.)
+
+
+## Implémentation
+
+### Base de données
+
+Nous avons utilisé PostgreSQL pour la base de données. Nous avons créé 12 tables, mais nous n'en utilisons
+que 10 dans l'application pour des raisons de temps et de complexité d'implémentation.
+
+![mld.svg](./db/docs/mld.svg)
+
+Les tables `categories` et `queue` ne sont pas utilisées dans l'application, mais sont encore présentes dans la base de
+données. Pour d'eventuelles futures améliorations.
+
+### Java stack
+Voici les outils que nous utilisons pour implémenter notre application web en Java:
 1. Javalin: un petit framework web léger et rapide
-1. Gradle: nous voulions tester autre chose que Maven pour gérer les dépendences, les builds et l'exécution de tests, nous avons pris son alternative.
-1. [JTE](https://jte.gg/): système de template permettant d'écrire facilement des vues en HTML
-1. TailwindCSS: un framework CSS très puissant et orienté sur des classes utilitaires
-1. Junit: le classique framework de test en Java
+2. Gradle: nous voulions tester autre chose que Maven pour gérer les dépendences, les builds et l'exécution de tests, nous avons pris son alternative.
+3. [JTE](https://jte.gg/): système de template permettant d'écrire facilement des vues en HTML
+4. TailwindCSS: un framework CSS très puissant et orienté sur des classes utilitaires
+5. Junit: le classique framework de test en Java
 
 ## Développement
 
 ### Prérequis
 1. JDK 21
-1. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas mais peuvent être reprise du `package.json`.
-1. [Gradle](https://gradle.org/install/) (optionnel mais recommandé)
+2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas mais peuvent être reprise du `package.json`.
+3. [Gradle](https://gradle.org/install/) (optionnel mais recommandé)
+4. [Docker](https://docs.docker.com/get-docker/)
+5. [NPM](https://www.npmjs.com/get-npm) (utilisé pour mettre à jour le CSS avec TailwindCSS)
 
 ### Mise en place
 Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradlew` sous Linux ou MacOS (`chmod +x ./gradlew` si erreur d'exécution), et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).

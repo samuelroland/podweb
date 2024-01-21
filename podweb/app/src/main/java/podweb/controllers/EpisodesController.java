@@ -4,7 +4,6 @@ import podweb.App;
 import podweb.models.Comment;
 import podweb.models.Episode;
 import podweb.models.Listen;
-import podweb.models.Podcast;
 import podweb.models.User;
 
 import java.util.ArrayList;
@@ -114,7 +113,6 @@ public class EpisodesController {
             ctx.result("Progression saved!");
         } catch (NumberFormatException e) {
             ctx.result("Invalid progression");
-            return;
         }
     }
 }

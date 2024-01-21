@@ -4,6 +4,7 @@
 package podweb;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
@@ -14,7 +15,6 @@ import io.javalin.http.HttpResponseException;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
 import podweb.controllers.*;
-import podweb.models.Episode;
 import podweb.models.User;
 
 public class App {
@@ -59,8 +59,11 @@ public class App {
         EpisodesController episodesController = new EpisodesController();
         app.get("/episodes/{id}", episodesController::episodeDetails);
         app.post("/episodes/{id}/progression", episodesController::updateListenProgression);
-        app.post("/episodes/{id}/comments", podcastsController::addComment);
-        app.post("/comments/{id}/delete", podcastsController::deleteComment);
+
+        // Comments related routes
+        CommentController commentController = new CommentController();
+        app.post("/episodes/{id}/comments", commentController::addComment);
+        app.post("/comments/{id}/delete", commentController::deleteComment);
 
         // Auth routes
         UsersController usersController = new UsersController();
@@ -77,37 +80,33 @@ public class App {
     }
 
     private static void manageErrorPages(Javalin app) {
-        // Do not show these sensitive errors in production
-        if (isProduction())
-            return;
+        // Return immediately if in production to avoid revealing sensitive errors
+        if (isProduction()) return;
 
-        // Affichage d'une joli page avec l'erreur et sa stack trace
-        // très utile pour le debug
+        // Display a formatted page with the error and its stack trace for debugging
         app.exception(Exception.class, (e, ctx) -> {
-            String msg = "<div style='font-family: monospace; font-size: 1.5em;'><h1>Java exception</h1>";
-            msg += "\n<h2>" + e.toString() + "</h2>\n";
-            for (var element : e.getStackTrace()) {
-                boolean bold = element.getClassName().startsWith("podweb");
-                msg += "<br>" + (bold ? ("<strong>" + element + "</strong>") : element);
-            }
-            msg += "</div>";
-            ctx.html(msg);
-            ctx.status(500);
+            StringBuilder msg = new StringBuilder("<div style='font-family: monospace; font-size: 1.5em;'><h1>Java exception</h1>");
+            msg.append("<h2>").append(e).append("</h2>");
+            formatStackTrace(e, msg);
+            ctx.html(msg.toString()).status(500);
         });
 
         // Stack trace on 404 error
         app.exception(HttpResponseException.class, (e, ctx) -> {
-            String msg = "<div style='font-family: monospace; font-size: 1.5em;'><h1>HttpResponseException</h1>";
-            msg += "\n<h2>" + e.toString() + "</h2>\n";
-            for (var element : e.getStackTrace()) {
-                boolean bold = element.getClassName().startsWith("podweb");
-                msg += "<br>" + (bold ? ("<strong>" + element + "</strong>") : element);
-            }
-            msg += "</div>";
-            ctx.html(msg);
-            ctx.status(404);
+            StringBuilder msg = new StringBuilder("<div style='font-family: monospace; font-size: 1.5em;'><h1>HttpResponseException</h1>");
+            msg.append("<h2>").append(e).append("</h2>");
+            formatStackTrace(e, msg);
+            ctx.html(msg.toString()).status(404);
         });
+    }
 
+    // Format the stack trace of an exception to be displayed in HTML
+    private static void formatStackTrace(Throwable e, StringBuilder msg) {
+        Arrays.stream(e.getStackTrace()).forEach(element -> {
+            boolean bold = element.getClassName().startsWith("podweb");
+            msg.append("<br>").append(bold ? "<strong>" + element + "</strong>" : element);
+        });
+        msg.append("</div>");
     }
 
     // Configuration of JTE templates
