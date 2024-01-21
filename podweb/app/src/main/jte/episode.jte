@@ -12,7 +12,9 @@
 
 @template.layout(
 content = @`
-<h2>Comments (${comments.size()})</h2>
+@template.episode-details(episode=episode, withDetails=true)
+
+<h2 class="mt-10">Comments (${comments.size()})</h2>
 @if (comments.isEmpty())
 <div class="flex flex-wrap">
     <h4 class="text-blue-500">$unsafe{"No comments here ! :-("}</h4>

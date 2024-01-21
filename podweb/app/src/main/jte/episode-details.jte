@@ -2,8 +2,8 @@
 @import podweb.models.Podcast
 @import podweb.models.User
 
-@param Podcast podcast = null
 @param Episode episode
+@param boolean withDetails = false
 
 <div class="my-3">
     <div class="flex items-center">
@@ -34,4 +34,8 @@
     </div>
 
     <div class="text-gray-600 flex-1 block line-clamp-6">$unsafe{episode.description.replace("\\n", "")}</div>
+
+    @if(withDetails)
+    <audio src="${episode.audio_url}" controls class="w-full my-3"></audio>
+    @endif
 </div>
