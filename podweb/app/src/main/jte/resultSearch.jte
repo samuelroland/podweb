@@ -6,41 +6,36 @@
 @param ArrayList<EpisodeSearch> episodes
 @param String query
 
-    @template.layout(
-    content = @`
+@template.layout(
+content = @`
     <h1>Search</h1>
         <form class="flex" action="/search" method="GET">
             <input value="${query}" type="text" name="q" class="p-1 w-full flex-1" placeholder="Search in title, description and author texts!">
             <button type="submit" class="ml-3">Search</button>
         </form>
     @if (!episodes.isEmpty())
-    <h3 class="">Episodes trouvés : </h3>
-    <div class="">
-        @if (episodes.isEmpty())
-            <h4 class="">${"Aucun! Cherche autre chose!!!"}</h4>
-        @endif
-        @for(EpisodeSearch episode : episodes)
-            <h4 class="">${episode.title}</h4>
-        <div class="my-3">
-            <div class="text-gray-700">
-                <p class="">$unsafe{episode.description.replace("\\n", "")}</p>
-                <p class="">Durée: ${episode.duration()}</p>
-
-                <a href="/podcasts/${episode.podcast_id}" class="text-blue-500">
-                    <h4 class="text-blue-500">${"Viens du podcast : " + episode.podcast_title}</h4>
+        <h3 class="">Episodes trouvés : </h3>
+        <div class="">
+            @if (episodes.isEmpty())
+                <h4 class="">${"Aucun! Cherche autre chose!!!"}</h4>
+            @endif
+            @for(EpisodeSearch episode : episodes)
+                @template.episode-details(episode=episode)
+                <a href="/podcasts/${episode.podcast_id}">
+                    <h4>Sur le podcast <span class="text-blue-500">${episode.podcast_title}</span></h4>
                 </a>
-                <p class="">$unsafe{"Description : " + episode.podcast_description}</p>
-                <p class="">${"Auteur : " + episode.podcast_author}</p>
-                <a href="/podcasts/${episode.podcast_id}" class="text-blue-500">
-                    <h4 class="text-blue-500">${"Cliquez ici pour acceder aux commentaires"}</h4>
-                </a>
-
-            <audio controls class="w-full my-1" src="${episode.audio_url}"></audio>
+                <div class="flex">
+                    <div class="mr-3 w-28 h-28">
+                        <img src="${episode.podcast_image}" class="">
+                    </div>
+                    <div class="flex-1">
+                        <p class="">$unsafe{episode.podcast_description.replace("\\n", "")}</p>
+                        <p class="">${episode.podcast_author}</p>
+                    </div>
+                </div>
+            @endfor
         </div>
-    </div>
-        @endfor
     @endif
-
-        `,
-        loggedUser
-        )
+`,
+loggedUser
+)
