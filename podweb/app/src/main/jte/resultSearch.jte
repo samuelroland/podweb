@@ -23,7 +23,7 @@ content = @`
         <div class="">
             @for(EpisodeSearch episode : episodes)
 
-                @template.episode-details(episode=episode, withDetails=true)
+                @template.episode-details(episode=episode)
 
                 <a href="/podcasts/${episode.podcast_id}">
                     <h4>Information sur le podcast : <span

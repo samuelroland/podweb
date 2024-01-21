@@ -13,7 +13,17 @@
         <a href="/episodes/${episode.id}" class="flex-1">
             <p class=" font-bold my-2 text-2xl line-clamp-1 podcast-link-title" title="${episode.title}">${episode.title}</p>
         </a>
+        @if(listen != null)
+        <div class="flex mx-3 space-x-2 items-center text-lg font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z" />
+            </svg>
+            <span>${listen.listening_count}</span>
+        </div>
+        @endif
         <span class="flex items-center mr-2">
+            <!-- time icon -->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mr-2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
@@ -71,7 +81,7 @@
                 },
                 setup() {
                     setInterval($data.sendProgress, 1000 * 15);
-                    $refs.el.currentTime = ${listen.progression} - 3;
+                    $refs.el.currentTime = ${listen != null ? listen.progression : 3} - 3;
                     if ($refs.el.currentTime < 0) $refs.el.currentTime = 0;
                 }
             }"
@@ -87,6 +97,7 @@
                 controls
                 class="w-full my-3 border-blue-600 border rounded-md bg-blue-100" x-ref="el">
             </audio>
+
         </div>
     @endif
 </div>
