@@ -118,6 +118,9 @@ obtenues et la liste des playlists qu'il a créées.
 
 ![Page d'utilisateur](Images/Profile_cap.png)
 
+## Données
+
+
 ## Implémentation
 
 ### Base de données
@@ -129,6 +132,41 @@ que 10 dans l'application pour des raisons de temps et de complexité d'impléme
 
 Les tables `categories` et `queue` ne sont pas utilisées dans l'application, mais sont encore présentes dans la base de
 données. Pour d'éventuelles futures améliorations.
+
+#### Origines des données
+
+Pour ne pas devoir créer à la main ou générer des données de développement, nous allons utiliser quelques milliers d'enregistrements de la base de données publique et ouverte du registre PodcastIndex. Ce registre répertorie plus de 4 millions de podcasts, nous allons en prendre qu'une toute petite partie parmi les podcasts et de leurs épisodes.
+
+La base de données ([téléchargeable ici](https://public.podcastindex.org/podcastindex_feeds.db.tgz)) fait déjà 4 Go et ne contient malheureusement pas les épisodes. Il nous faut donc aller les chercher via leur API ou directement via leur flux RSS. Les catégories sont définies dans 10 attributs de la table podcasts, il nous faut en conséquence les extraire et créer les catégories et les associations vers chaque podcast. 
+
+Pour se faire nous avons créer deux script python :
+- `scrap_episodes_script.py` qui permet de récupérer les épisodes pour chaque podcast dans la base de donnée téléchargée.
+- `json_to_sql.py` qui transforme les fichier .json des podcasts et épisodes en sql qui INSERT dans les tables de notre db les épisodes, les podcasts, les catégories et fait le lien entre chaque podcast et catégories en remplissant la table `categorize`.
+
+Il nous restera ainsi à générer aléatoirement des utilisateurs et des playlists avec des épisodes, des écoutes d'épisodes pour chaque utilisateur. Une partie des utilisateurs auront déjà des files d'attentes remplies avec quelques épisodes. Au final, nous aurons donc une base de données légère avec seulement les attributs des podcasts qui nous intéressent et les autres tables.
+
+#### Badges
+Nous allons développer un système de *badges* attribués aux utilisateurs quand ils atteignent certains niveaux d'engagement sur Podweb. La liste détaillées des badges sera définie plus tard, mais voici 2-3 exemples qui justifient notre modèle de donnée.
+| Type             | Name         | Points        | Condition        | Description                                                      |
+| ---------------- | ------------ | ------------- | ---------------- | ---------------------------------------------------------------- |
+| ListeningCount   | PetaListener | 100000000 pts | 10000 listenings | You are a peta listener, do you even have a life ?               |
+| RegistrationDate | BabyCaster   | 100 pts       | 1 month passed   | You are not new as a month ago...                                |
+| RegistrationDate | TeenCaster   | 300 pts       | 6 months passed  | Starting to rebel as a teen listening to podcasts instead of TV. |
+
+Les 4 types suivants sont possibles:
+1. `ListeningCount`: le badge sera attribué à partir d'un certain **nombre d'écoutes d'épisodes** (2 écoutes du même épisode compte bien 2 fois)
+1. `RegistrationDate`: le badge sera attribué à partir d'un certain **temps passé après la date de création de compte**
+1. `PlaylistCreation`: le badge sera attribué à partir d'un certain nombres **de playlists créées**
+1. `CommentsCount`: le badge sera attribué à partir d'un certain nombres de **commentaires postés**
+
+#### Remarques
+
+1. Podcast
+	- `episodes_count`: ce champ ne peut pas être déduit du nombre d'épisodes stockés car c'est le nombre total. Nous n'allons pas forcèment stocker la totalité des épisodes parce que certains podcasts ont des milliers d'épisodes. Cette valeur provient de la base de données Podcastindex.org et sert à l'affichage dans la liste des podcasts.
+	- `author`: Dans la base de données PodcastIndex, nous avons uniquement le nom (`itunesAuthor`) par ex. `Kevin Zade` et (`itunesOwnerName`) par ex. `One Brew Over the Cuckoos Nest`. Nous avons considéré le fait d'avoir une entité `authors` mais il n'y aurait que 2 champs, et s'il y a 2 personnes avec les mêmes noms on ne pourrait pas les différencier. Nous allons donc juste garder la valeur de `itunesAuthor` dans `author` et cela n'empêche pas la recherche de podcasts par le nom d'auteur.
+
+1. Listening
+   - `listening_count` est le nombre total d'écoute entre un utilisateur et un épisode. Cette valeur est incrémentée chaque fois que l'écoute atteint 100%.
 
 ### Java stack
 Voici les outils que nous utilisons pour implémenter notre application web en Java :
@@ -216,6 +254,10 @@ Nous utilisons les vues dans notre classement afin de savoir le nombre total d'�
 La vue `episodes_ranking` liste tous les épisode avec leur nombre d'écoutes respectif et les tries selon celui-ci.
 
 La vue `podcasts_ranking` utilise la vue précédente pour récupérer le nombre d'écoute total par podcast et les trier par celui-ci.
+
+### Progression
+
+La progression qui nous permet de retrouver où nous étions dans le podcast après avoir quitté la page est appliquée avec une soustraction de 3 secondes permettant de ne pas reprendre la lecture au milieu d'une phrase sans contexte.
 
 ## Développement
 
