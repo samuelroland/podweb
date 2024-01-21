@@ -31,7 +31,7 @@
                 </a>
                 <p class="">$unsafe{"Description : " + episode.podcast_description}</p>
                 <p class="">${"Auteur : " + episode.podcast_author}</p>
-                <a href="/podcasts/${episode.podcast_id}/comments" class="text-blue-500">
+                <a href="/podcasts/${episode.podcast_id}" class="text-blue-500">
                     <h4 class="text-blue-500">${"Cliquez ici pour acceder aux commentaires"}</h4>
                 </a>
 

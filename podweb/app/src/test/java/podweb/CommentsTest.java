@@ -37,7 +37,7 @@ public class CommentsTest {
     @Test
     public void comments_page_exists() {
         JavalinTest.test(app, (server, client) -> {
-            var res = client.get("/episodes/74/comments");
+            var res = client.get("/episodes/74");
             assertEquals(200, res.code());
             String page = res.body().string();
             ArrayList<Comment> comments = Comment.o.getBy("episode_id", 74);
@@ -61,7 +61,7 @@ public class CommentsTest {
             var res = client.post("/episodes/1/comments", "content=heythere&note=5&episode_id=1&user_id=1");
             assertThat(res.body().string()).doesNotContain("Failed to create comment");
             assertEquals(200, res.code());
-            var res2 = client.get("/episodes/1/comments");
+            var res2 = client.get("/episodes/1");
             assert res2.body() != null;
             String page = res2.body().string();
             assertThat(page).doesNotContain("Login error");
@@ -103,7 +103,7 @@ public class CommentsTest {
             // commentaires??
 
             assertEquals(cCount - 2, Comment.o.count());
-            var res2 = client.get("/episodes/1/comments");
+            var res2 = client.get("/episodes/1");
             assert res2.body() != null;
             String page = res2.body().string();
             assertThat(page).doesNotContain("Login error");

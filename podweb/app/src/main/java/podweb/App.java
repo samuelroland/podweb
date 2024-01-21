@@ -14,6 +14,7 @@ import io.javalin.http.HttpResponseException;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
 import podweb.controllers.*;
+import podweb.models.Episode;
 import podweb.models.User;
 
 public class App {
@@ -54,8 +55,9 @@ public class App {
         app.get("/search", podcastsController::search);
         app.get("/ranking", podcastsController::ranking);
 
-        // Episodes related routes (mostly comments)
-        app.get("/episodes/{id}/comments", podcastsController::comments);
+        // Episodes and comments related routes
+        EpisodesController episodesController = new EpisodesController();
+        app.get("/episodes/{id}", episodesController::episodeDetails);
         app.post("/episodes/{id}/comments", podcastsController::addComment);
         app.post("/comments/{id}/delete", podcastsController::deleteComment);
 
