@@ -37,4 +37,9 @@ echo "
 psql -h "127.0.0.1" -U "$PGUSER" -a -c "set search_path=podweb; update users set password = 'pass';" -v ON_ERROR_STOP=1
 
 echo "
+--- Setting BabyListener badge condition to 3"
+psql -h "127.0.0.1" -U "$PGUSER" -a -c "set search_path=podweb; update badges set condition_value = 3 where id = 1;" -v ON_ERROR_STOP=1
+
+
+echo "
 Seems to be all good !"
