@@ -41,8 +41,10 @@
                 eid: ${ episode.id },
                 play: false,
                 progress: 0,
+                duration: 0,
                 latestProgress: 0,
                 logged: ${logged},
+                done: false,
                 sendProgress: () => {
                     if ($data.logged == false || $data.latestProgress == $data.progress) return;
                     fetch('/episodes/' + $data.eid + '/progression',
@@ -52,6 +54,17 @@
                         }
                     );
                     $data.latestProgress = $data.progress;
+                },
+                saveProgress(e) {
+                    $data.progress = e.target.currentTime;
+                    if ($data.progress + 1 > $data.duration) {
+                        if ($data.done == false && $data.duration > 0){
+                            $data.sendProgress();
+                            $data.done = true;
+                        }
+                    } else {
+                        $data.done = false;
+                    }
                 }
             }"
             x-init="setInterval(sendProgress, 1000 * 15);"
@@ -59,8 +72,9 @@
             <audio src="${episode.audio_url}"
                 @play="play = true" 
                 @pause="play = false" 
-                @timeupdate="progress = $event.target.currentTime" 
+                @timeupdate="saveProgress($event)" 
                 preload="metadata"
+                @durationchange="duration = $event.target.duration"
                 controls
                 class="w-full my-3 border-blue-600 border rounded-md bg-blue-100">
             </audio>
