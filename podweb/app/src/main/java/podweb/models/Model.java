@@ -222,7 +222,6 @@ public abstract class Model<T> {
         ArrayList<Object> params = new ArrayList<>();
         var nb = getQuery().update("DELETE FROM " + table() + " " +
                 buildWhereClauseAndFillValuesWithInstance(params), params.toArray());
-        System.out.println("delete nb " + nb);
         return nb == 1;
     }
 

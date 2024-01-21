@@ -27,8 +27,6 @@ public class CommentController {
             comment.parent_id = Integer.parseInt(ctx.formParam("parent_id"));
         }
         comment.date = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
-        // comment.date = Timestamp.valueOf("2023-03-14 14:30:42.123 456 789");
-        System.out.println(comment);
         if (comment.create()) {
             ctx.redirect("/episodes/" + comment.episode_id);
         } else {
