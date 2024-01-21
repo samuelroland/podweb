@@ -7,6 +7,37 @@ Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
 
 <p style="page-break-before: always"></p>
 
+- [Introduction](#introduction)
+- [Fonctionnalités](#fonctionnalités)
+- [Utilisation](#utilisation)
+  - [Accueil](#accueil)
+  - [Détail d'un podcast](#détail-dun-podcast)
+  - [Detail d'un épisode](#detail-dun-épisode)
+  - [Ranking](#ranking)
+  - [Recherche](#recherche)
+  - [Page de connexion](#page-de-connexion)
+  - [Liste d'utilisateurs](#liste-dutilisateurs)
+  - [Page utilisateur](#page-utilisateur)
+- [Implémentation](#implémentation)
+  - [Base de données](#base-de-données)
+  - [Java stack](#java-stack)
+  - [Différences avec cahier des charges](#différences-avec-cahier-des-charges)
+  - [Modèles](#modèles)
+  - [Opérations sur la base de donnée (CRUD)](#opérations-sur-la-base-de-donnée-crud)
+  - [Triggers](#triggers)
+  - [Vues](#vues)
+- [Développement](#développement)
+  - [Prérequis](#prérequis)
+- [Déploiement](#déploiement)
+  - [Image docker](#image-docker)
+  - [Mise en place](#mise-en-place)
+  - [Lancement des tests](#lancement-des-tests)
+  - [Développement des vues](#développement-des-vues)
+  - [Tricks mis en place pour l'écriture de tests automatisés](#tricks-mis-en-place-pour-lécriture-de-tests-automatisés)
+- [Divers](#divers)
+
+<p style="page-break-before: always"></p>
+
 ## Introduction
 
 Dans le cadre du cours de base de données relationnelles, il nous a été demandé de réaliser une application qui utilise une base donnée.
@@ -98,7 +129,7 @@ Une recherche sans résultats
 
 ![Recherche sans résultats](Images/Search%20_no_result_cap.png)
 
-### Page de connection
+### Page de connexion
 
 Cette page nous permet de nous connecter en tant qu'utilisateur de podweb.
 
@@ -170,11 +201,11 @@ Les 4 types suivants sont possibles:
 
 ### Java stack
 Voici les outils que nous utilisons pour implémenter notre application web en Java :
-1. Javalin : un petit framework web léger et rapide
-2. Gradle : nous voulions tester autre chose que Maven pour gérer les dépendances, les builds et l'exécution de tests, nous avons pris son alternative.
+1. [Javalin](https://javalin.io/) : un petit framework web léger et rapide
+2. [Gradle](https://gradle.org/) : nous voulions tester autre chose que Maven pour gérer les dépendances, les builds et l'exécution de tests, nous avons pris son alternative.
 3. [JTE](https://jte.gg/) : système de template permettant d'écrire facilement des vues en HTML
-4. TailwindCSS : un framework CSS très puissant et orienté sur des classes utilitaires
-5. JUnit : le classique framework de test en Java
+4. [TailwindCSS](https://tailwindcss.com/) : un framework CSS très puissant et orienté sur des classes utilitaires
+5. JUnit: le classique framework de test en Java
 
 ### Différences avec cahier des charges
 
@@ -198,46 +229,122 @@ Les triggers des badges en relations avec les playlists ne marchent donc pas, ca
 
 ### Modèles
 
-Dans notre application, nous devons communiquer avec la base de données. Ne pouvant pas utiliser d'ORM, 
-nous en avons fait un plus simple de toute pièce.
+Dans notre application, nous devons communiquer avec la base de données. Ne pouvant pas utiliser d'ORM, nous en avons construit un petit ORM nous même afin de réduire la quantité de code répétitif dans les modèles.
 
-Chaque modèle implémente la classe `Model`. Cette classe abstraite permet de fournir plusieurs des requêtes SQL communes à
-tous les modèles qui l'implémente. Cette classe marche un unison avec la classe `Query` dont une instance est créée dans chaque
-modèle, c'est sur cette instance que `Model` exécute ses requêtes. 
+**Cette ORM fait maison se découpe en 2 parties**. La classe `Query` et la classe abstraite `Model`.
 
-`Query` est la classe qui va permettre de faire le lien entre les classes java modèles que nous avons créés et les tables de
-la base de donnée. 
+`Query<T>` est une classe générique nous permet de fournir une abstraction au dessus de JDBC permettant de facilement exécuter des requêtes SQL de lecture et d'écritures avec des paramètres préparés. Il suffit d'avoir une requête SQL dans une String, contenant des `?` pour les paramètres et de fournir un tableau de valeurs de différents types ou un objet dont tous les attributs sont utilisés.
 
-Elle nous permet :
-1. De mapper directement les colonnes et la table aux paramètres de notre classe ou inversement.
-2. De garder la configuration pour la connection à la base de données en "mémoire".
-3. De transformer le `ResultSet` que nous renvoie *JDBC* en une `ArrayList<Object>` plus simple à manipuler et utiliser avec *JTE*.
+```java
+//Préparation de l'objet Query pour les podcasts (type générique et référence sur la classe)
+Query<Podcast> q = new Query<>(Podcast.class);
+//Exemple de requête avec paramêtre
+q.query("select * from podcasts where id = ?;", new Object[] { id });
+```
 
-### Operations sur la base de donnée (CRUD)
+Elle s'occupe également de gérer la connection avec la base de données. La connexion se fait à la première utilisation de la classe Query et reste constamment ouverte. La configuration pour la connexion à la base de données est chargée depuis les variables d'environnement suivantes:
+- `DB_HOST`: la machine hôte de Postgresql (par défaut `localhost`)
+- `DB_PORT`: le port utilisée par Postgresql (par défaut `5432`)
+- `DB_USER`: l'utilisateur Postgresql
+- `DB_PWD`: et son mot de passe
+
+Ces variables d'environnement sont définies et chargées via le fichier `.env` durant le développement (chargée par `gradle run` et pour l'usage en production (chargé par Docker)).
+
+Il est aussi possible de démarrer, rollback ou commit des transactions (même si nous n'avons pas eu besoin d'utiliser des transactions, cela était utile pour l'exécution des tests).
+
+```java
+//Exemple de méthodes pour gérer des transactions
+Query.startTransaction();
+Query.commit();
+Query.rollback();
+```
+
+Pour les requêtes de lecture, une `ArrayList<T>` est retournée au lieu d'un `ResultSet` car les objets sont automatiquement créés à partir de chaque tuple et chaque colonne utile. La liste des attributs est lues sur la référence à la classe modèle via le système de Reflection en Java afin de pouvoir déduire et remplir les attributs nécessaires du bon type.
+
+Pour la 2ème partie de l'ORM, chaque modèle (`Podcast`, `Episode`, `User`) hérite de la classe `Model`. Cette classe abstraite fournit des opérations basiques utiles à tous les modèles (`all()`, `find(id)`, `getBy(field, value)`, `exists()`, `create()`, `update()`, `delete()`). `Model` implémente ces méthodes à l'aide de requêtes via la classe `Query` grâce à un objet de cette classe propre à chaque modèle.
+
+La méthode `Model.create()` se charge également d'appliquer l'`id` auto-générée par la DB sur l'objet en cours.
+
+Ce qui est génial c'est que n'avons donc pas besoin de définir un mappage pour chaque modèle, seulement de définir le nom de la table, les attributs et si la clé primaire n'est pas `id`, la liste des champs qui identifient uniquement une entrée.
+
+Voici un exemple simplifié pour les podcasts, notre modèle `Podcast.java`, nous avons juste défini le nom de la table et les attributs.
+```java
+package podweb.models;
+public class Podcast extends Model<Podcast> {
+    public int id;
+    public String title;
+    public String description;
+    public String rss_feed;
+    public String image;
+    public String author;
+    public int episodes_count;
+    public static Podcast o = new Podcast();
+    public static Query<Podcast> q = new Query<>(Podcast.class);
+
+    public String table() { return "podcasts"; }
+    public Query<Podcast> getQuery() { return q; }
+}
+```
+
+Dans les controlleurs, il est maintenant possible d'utiliser toutes les modèles fournie par `Model`:
+```java
+ArrayList<Podcast> podcasts = Podcast.o.all();  //Exemple de lecture de tous les podcasts
+Podcast p = Podcast.o.find(4);  //Exemple de lecture d'un podcast
+if (Podcast.exists(2))  // Exemple pour savoir si un podcast exist
+```
+
+Autre exemple simplifié de création d'un commentaire dans un controlleur:
+```java
+Comment comment = new Comment();
+comment.content = "Super commentaire"
+comment.note = 3;
+comment.episode_id = 10;
+comment.user_id = 12;
+comment.parent_id = null;
+comment.date = Timestamp.valueOf(LocalDateTime.now());
+comment.create();   //comment.id a été défini si la création est un succès
+```
+
+Pour le modèle `Queue` nous avons du redéfinir les champs identifiants à `user_id` et `episode_id` car il n'y a pas de clé primaire `id` dans ce cas et les méthodes qui doivent sélectionner un élément unique en ont besoin (`Model.find()`, `Model.create()`, `Model.update()` et `Model.delete()`).
+```java
+package podweb.models;
+public class Queue extends Model<Queue> {
+    public int user_id;
+    public int episode_id;
+    public int index;
+    public static Queue o = new Queue();
+    //Nos 2 champs identifiants
+    private static String[] keys = new String[] { "user_id", "episode_id" };
+    private static Query<Queue> q = new Query<>(Queue.class);
+    
+    public String table() { return "queue"; }
+    public Query<Queue> getQuery() { return q; }
+    
+    //Redéfinition de la méthode de Model
+    public String[] intPrimaryKeys() { return keys; }   
+}
+```
+
+### Opérations sur la base de donnée (CRUD)
 
 Nous avons implémenté les opérations CRUD dans ces situations : 
 
-#### Création :
+1. **Création**
+    - Création d'un nouveau commentaire → `Model.create()`, utilisé lorsqu'on veut rajouter de nouveau commentaires sous chaque épisode.
 
-- Création d'un nouveau commentaire → Méthode create de `Model`, utilisé lorsqu'on veut rajouter de nouveau commentaires sous chaque épisode.
+1. **Suppression**
+    - Suppression d'un commentaire → `Model.delete()`, utilisé lorsqu'on veut supprimer un commentaire que l'on a posté.
 
-#### Délétion :
+1. **Mise à jour**
+    - Mise à jour de la progression d'écoute d'un épisode → `Model.update()`, utilisé lorsqu'on écoute un épisode et que l'on veut sauvegarder notre progression.
 
-- Suppression d'un commentaire → Méthode delete de `Model`, utilisé lorsqu'on veut supprimer un commentaire que l'on a posté.
+1. **Obtention**
+    - Liste des épisodes, podcasts, utilisateurs, commentaires, badges, playlists, etc. → `Model.all()`, utilisé lorsqu'on veut afficher une liste d'épisodes, de podcasts, etc.
+    - Un épisode, podcast, utilisateur, commentaire, badge, playlist, etc. → `Model.getBy()`, utilisé lorsqu'on veut récupérer une liste d'éléments filtrés par une clé étrangère d'une relation.
 
-#### Mise à jour :
+### Triggers 
 
-- Mise à jour de la progression d'écoute d'un épisode → Méthode update de `Model`, utilisé lorsqu'on écoute un épisode et que l'on veut sauvegarder notre progression.
-
-#### Obtention :
-
-- Liste des épisodes, podcasts, utilisateurs, commentaires, badges, playlists, etc. → Méthode all de `Model`, utilisé lorsqu'on veut afficher une liste d'épisodes, de podcasts, etc.
-
-- Un épisode, podcast, utilisateur, commentaire, badge, playlist, etc. → Méthode getBy de `Model`, utilisé lorsqu'on veut afficher un épisode, un podcast, etc, avec un id spécifique.
-
-### Triggers : 
-
-Les triggers sont utilisés pour donner des badges aux utilisateurs. Chaque condition est spécifique à chaque type de badge.
+Les triggers sont utilisés pour donner des badges aux utilisateurs. Chaque condition est spécifique au type de badge.
 
 Donc les badges qui sont basés sur le nombre d'écoute n'aura pas le même trigger que celui des commentaires.
 
@@ -263,7 +370,7 @@ La progression qui nous permet de retrouver où nous étions dans le podcast apr
 
 ### Prérequis
 1. JDK 21
-2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors, il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas, mais peuvent être reprise du `package.json`.
+2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS)
 3. [Gradle](https://gradle.org/install/) (optionnel, mais recommandé)
 4. [Docker](https://docs.docker.com/get-docker/)
 5. [NPM](https://www.npmjs.com/get-npm) (utilisé pour mettre à jour le CSS avec TailwindCSS)
@@ -308,9 +415,9 @@ Note : Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle`
     ```sh
     git clone https://github.com/samuelroland/podweb
     ```
-1. Pour installer tailwindcss via NPM
+1. Pour installer les dépendances via NPM
     ```sh
-    npm install -D tailwindcss
+    npm i
     ```
 1. Pour charger le style une première fois (obligatoire lorsqu'il y a du changement dans les pages html ou css)
     ```sh

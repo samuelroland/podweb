@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRESQL_USERNAME=bdr
       - POSTGRESQL_PASSWORD=bdr
-      - POSTGRESQL_DATABASE=bdr
+      - POSTGRESQL_DATABASE=podweb
       - POSTGRESQL_POSTGRES_PASSWORD=root
     ports:
       - 5432:5432
@@ -34,3 +34,14 @@ services:
       - podweb-net
     ports:
       - 7000:7000
+
+  dbsetup:
+    depends_on: 
+    - postgresql
+    build: ../
+    environment:
+      - DB_HOST=postgresql
+    volumes:
+      - ../:/repos
+    networks:
+      - podweb-net
