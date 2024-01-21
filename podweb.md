@@ -1,6 +1,7 @@
-# Podweb rapport
-<!-- TODO: faire une joli page de titre ! -->
-<!-- TODO: trouver un moyen de faire un joli export -->
+# Podweb
+<!-- TODO: faire une joli page de titre avec saut de page ! -->
+<!-- TODO: inclure photo de l'app sur la page de titre ! -->
+<!-- TODO: faire un joli export -->
 
 ## Java stack
 Voici les outils que nous utilisons pour implémenter noter application web en Java:
@@ -18,7 +19,7 @@ Voici les outils que nous utilisons pour implémenter noter application web en J
 1. [Gradle](https://gradle.org/install/) (optionnel mais recommandé)
 
 ### Mise en place
-Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradle` sous Linux ou MacOS, et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).
+Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradlew` sous Linux ou MacOS (`chmod +x ./gradlew` si erreur d'exécution), et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).
 
 1. Cloner le repos
     ```sh
@@ -106,7 +107,7 @@ PODWEB_PRODUCTION="" java -jar app/build/libs/app-uber.jar
 ### Image docker
 Afin de facilement lancer ou déployer notre application, nous avons créé un `Dockerfile` dédié:
 
-Note: les commandes sont toujours dans le dossier `podweb`.
+Note: les commandes sont toujours à lancer dans le dossier `podweb`.
 
 Préparatifs et docker build de l'image:
 ```sh
@@ -122,3 +123,33 @@ TODO: faire un docker-compose.yml pour y ajouter la base de données et connecte
 ```sh
 docker compose up
 ```
+
+### Tricks mis en place pour l'écriture de tests automatisés
+
+Permet de développer plus rapidement et vérifier que ça marche sans devoir constamment rebuilder le serveur et tester dans son navigateur.
+
+1. Toutes les classes de tests contenant des tests sur des actions faisant des écritures dans la base de données doivent configurer les requêtes pour être lancés dans des transactions SQL et rollback à la fin. Ceci permet d'avoir toujours la même base de données fraîche et non modifiée au début de chaque test !
+    ```java
+    @BeforeEach
+    public void setup() throws SQLException {
+        Query.startTransaction();
+    }
+
+    @AfterEach
+    public void finish() throws SQLException {
+        Query.rollback();
+    }
+    ```
+
+1. Se connecter programmatiquement
+    ```java
+    AppTest.actingAs(1);    //User 1 is Eulalia Botsford
+    ```
+1. Tester qu'un bout de texte se trouve bien dans la page retournée. Permet de savoir si les données utiles sont bien présentes.
+    ```java
+    var res = client.get("/login");
+    assertThat(res.body().string()).contains("<h1>Login").contains("<input").contains("Submit");
+    ```
+
+## Divers
+- Toutes les icones en SVG viennent de [heroicons.com](heroicons.com) sous licence MIT.
