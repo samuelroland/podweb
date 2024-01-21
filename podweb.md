@@ -64,6 +64,39 @@ Voici les outils que nous utilisons pour implémenter notre application web en J
 4. [Docker](https://docs.docker.com/get-docker/)
 5. [NPM](https://www.npmjs.com/get-npm) (utilisé pour mettre à jour le CSS avec TailwindCSS)
 
+## Déploiement
+Voici les commandes pour déployer notre application sur un serveur. Les commandes sont à lancer dans le dossier `podweb`.
+
+D'abord, il faut faire un build optimisé pour la production des styles CSS. Le fichier produit est toujours le même : `./app/src/main/static/out.css`, il est cependant minifié pour être le plus léger possible.
+```sh
+npm run prod
+```
+
+Pour builder le projet dans un "fat jar" c'est-à-dire une archive `.jar` qui contient toutes les dépendances utiles en dehors du développement :
+```sh
+gradle uberJar
+```
+L'archive générée est présente au chemin suivant : `app/build/libs/app-uber.jar`.
+
+Pour exécuter notre archive avec `java -jar ...`, la variable d'environnement `PODWEB_PRODUCTION` doit être définie, elle permet d'indiquer qu'il faut utiliser les versions compilées des templates JTE chargées dans le JAR et non les chercher dans le dossier originel. Il faut également qu'un dossier static soit présent à côté et que le `out.css` soit copié dedans.
+```sh
+PODWEB_PRODUCTION="" java -jar app/build/libs/app-uber.jar
+```
+
+### Image docker
+Afin de facilement lancer ou déployer notre application, nous avons créé un `Dockerfile` dédié :
+
+Note : les commandes sont toujours à lancer dans le dossier `podweb`.
+
+Préparatifs et docker build de l'image :
+```sh
+./prod.sh
+```
+
+```sh
+docker compose up
+```
+
 ### Mise en place
 Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradlew` sous Linux ou MacOS (`chmod +x ./gradlew` si erreur d'exécution), et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).
 
@@ -73,28 +106,29 @@ Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` 
     ```
 1. Pour installer tailwindcss via NPM
     ```sh
-    npm install
-    # ou en plus court
-    npm i
+    npm install -D tailwindcss
     ```
-1. Pour charger le style une première fois
+1. Pour charger le style une première fois (obligatoire lorsqu'il y a du changement dans les pages html ou css)
     ```sh
     npm run prod
     ```
-1. TODO: setup db podweb
 1. Pour configurer la base de données, il suffit de créer un fichier `.env` et d'indiquer les identifiants
    ```env
     DB_PORT=5432
     DB_USER=
     DB_PWD=
    ```
+11. Pour lancer notre base de données PostgreSQL (se mettre dans le dossier `podweb`)
+     ```sh
+     docker compose up -d
+     ```
 1. Pour lancer l'application directement (build + run)
     ```sh
     gradle run
     ```
 1. Ouvrir son navigateur en `localhost:7000`
 
-Autres commandes utiles:
+Autres commandes utiles :
 
 Pour builder le projet:
 ```sh
@@ -130,45 +164,6 @@ Nous utilisons NPM pour facilement installer le tailwindcss et le mettre à jour
 
 Note: des extensions d'IDE pour supporter la syntaxe JTE existe pour [IntelliJ](https://plugins.jetbrains.com/plugin/14521-jte/) et [VSCode](https://marketplace.visualstudio.com/items?itemName=maj2c.jte-template-syntax-highlight). Très pratique pour avoir des couleurs utiles et avoir de l'autocomplétion HTML et CSS, tout en ayant les couleurs et propositions liées à Java.
 
-
-## Déploiement
-Pour déployer un serveur podweb, les commandes sont un peu différentes.
-
-D'abord, il faut faire un build optimisé pour la production des styles CSS. Le fichier produit est toujours le même: `./app/src/main/static/out.css`, il est cependant minifié pour être le plus léger possible.
-```sh
-npm run prod
-```
-
-Pour builder le projet dans un "fat jar" c'est à dire une archive `.jar` qui contient toutes les dépendances utiles en dehors du développement:
-```sh
-gradle uberJar
-```
-L'archive générée est présente au chemin suivant: `app/build/libs/app-uber.jar`.
-
-Pour exécuter notre archive avec `java -jar ...`, la variable d'environement `PODWEB_PRODUCTION` doit être définie, elle permet d'indiquer qu'il faut utiliser les versions compilées des templates JTE chargées dans le JAR et non les chercher dans le dossier originel. Il faut également qu'un dossier static soit présent à coté et que le `out.css` soit copié dedans.
-```sh
-PODWEB_PRODUCTION="" java -jar app/build/libs/app-uber.jar
-```
-
-### Image docker
-Afin de facilement lancer ou déployer notre application, nous avons créé un `Dockerfile` dédié:
-
-Note: les commandes sont toujours à lancer dans le dossier `podweb`.
-
-Préparatifs et docker build de l'image:
-```sh
-./prod.sh
-```
-
-Et pour lancer notre image sur le port 7000
-```sh
-docker run -p 7000:7000 podweb
-```
-
-TODO: faire un docker-compose.yml pour y ajouter la base de données et connecter les 2 ensembles.
-```sh
-docker compose up
-```
 
 ### Tricks mis en place pour l'écriture de tests automatisés
 
