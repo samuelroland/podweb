@@ -16,7 +16,7 @@
             <!-- Display user information -->
             <div class="user-info text-lg mb-6">
                 <p><strong>User:</strong> ${user.firstname} ${user.lastname}</p>
-                <p><strong>Registration Date:</strong> ${user.registration_date.toString()}</p>
+                <p><strong>Registration Date:</strong> ${user.registration_date()}</p>
             </div>
 
             <!-- User Badges Section -->
