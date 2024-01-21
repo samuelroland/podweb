@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Badge extends Model<Badge>{
     public int id;
     public String name;
-    public int point;
+    public int points;
     public String description;
     public int type;
     public int condition_value;
@@ -25,6 +25,6 @@ public class Badge extends Model<Badge>{
 
     public static ArrayList<Badge> byUser(int user_id){
         String query = "SELECT b.* FROM badges b INNER JOIN obtain o ON b.id = o.badge_id WHERE o.user_id = ?;";
-        return q.query(query, user_id);
+        return q.query(query, new Object[] {user_id});
     }
 }

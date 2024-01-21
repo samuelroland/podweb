@@ -23,17 +23,17 @@
             <div class="user-badges mb-8">
                 <h2 class="text-2xl font-semibold mb-4">Badges</h2>
                 <!-- Display user badges -->
-                <ul class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @for(Badge badge : badges)
-                        <li class="p-4 bg-white rounded-md shadow-md">
+                        <div class="p-4 bg-white rounded-md shadow-md">
                             <div class="badge-info">
                                 <h2 class="text-lg font-semibold">${badge.name}</h2>
                                 <p class="text-gray-600">${badge.description}</p>
-                                <p class="text-gray-600">Points: ${badge.point}</p>
+                                <p class="text-gray-600">Points: ${badge.points}</p>
                             </div>
-                        </li>
+                        </div>
                     @endfor
-                </ul>
+                </div>
             </div>
 
             <!-- User Playlists Section -->

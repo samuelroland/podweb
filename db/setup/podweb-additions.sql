@@ -25,8 +25,8 @@ DECLARE
 BEGIN
 	IF NEW.listening_count IS DISTINCT FROM OLD.listening_count THEN
 	    -- ListeningCount est le type 0
-		FOR badge IN SELECT * FROM badges WHERE type = 0 LOOP
-			IF NEW.listening_count = badge.condition_value THEN
+		FOR badge IN SELECT * FROM badges WHERE type = 1 LOOP
+			IF NEW.listening_count >= badge.condition_value THEN
 			    INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge.id);
 			    EXIT;
 			END IF;
@@ -50,7 +50,7 @@ BEGIN
     -- Check if it's a different day
     IF days_diff IS DISTINCT FROM DATE_PART('day', now() - OLD.registration_date) THEN
         -- Iterate through the badges with type 1, type 1 is RegistrationDate
-        FOR badge IN SELECT * FROM badges WHERE type = 1 LOOP
+        FOR badge IN SELECT * FROM badges WHERE type = 2 LOOP
             -- Check if the condition value matches the days difference
             IF days_diff = badge.condition_value THEN
                 -- Insert a record into the obtain table
@@ -83,7 +83,7 @@ BEGIN
             RETURN NEW;
         END IF;
 	    -- PlaylistCreation est le type 2
-		FOR badge IN SELECT * FROM badges WHERE type = 2 LOOP
+		FOR badge IN SELECT * FROM badges WHERE type = 3 LOOP
 			IF NEW.count_playlists = badge.condition_value THEN
 			    INSERT INTO obtain (user_id, badge_id) VALUES (NEW.user_id, badge.id);
 			    EXIT;
@@ -109,7 +109,7 @@ BEGIN
     -- Find a badge that matches the number of comments
     SELECT id INTO badge_id_to_award
     FROM badges
-    WHERE type = 3 AND condition_value = badge_count;
+    WHERE type = 4 AND condition_value <= badge_count;
 
     IF FOUND THEN
         -- Check if the badge already exists
