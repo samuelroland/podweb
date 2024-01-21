@@ -8,13 +8,14 @@
 
 <div class="my-3">
     <div class="flex items-center">
-        <p class="flex-1 font-bold  my-2 text-2xl line-clamp-1" title="${episode.title}">${episode.title}</p>
-
+        <a href="/episodes/${episode.id}">
+            <p class="flex-1 font-bold my-2 text-2xl line-clamp-1 podcast-link-title" title="${episode.title}">${episode.title}</p>
+        </a>
         <span class="flex items-center mr-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mr-2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-            <span class="font-bold text-lg">${episode.duration()}</span>
+            <span class="font-bold text-lg">${"   " + episode.duration()}</span>
         </span>
         <a href="/episodes/${episode.id}/#play" class="hover:bg-orange-300 rounded-sm p-1">
             <!-- play icon -->
@@ -81,3 +82,14 @@
         </div>
     @endif
 </div>
+
+<style>
+    .podcast-link-title {
+        cursor: pointer;
+        margin-right: 1rem;
+    }
+
+    .podcast-link-title:hover {
+        color: blue;
+    }
+</style>

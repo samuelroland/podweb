@@ -22,7 +22,9 @@ content = @`
         <br>
         <div class="">
             @for(EpisodeSearch episode : episodes)
-                @template.episode-details(episode=episode)
+
+                @template.episode-details(episode=episode, withDetails=true)
+
                 <a href="/podcasts/${episode.podcast_id}">
                     <h4>Information sur le podcast : <span
                                 class="text-blue-500 hover:text-blue-600 transition duration-200">${episode.podcast_title}</span>
