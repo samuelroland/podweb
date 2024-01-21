@@ -77,6 +77,7 @@ tasks.register('uberJar', Jar) {
 }
 
 tasks.uberJar {
+    dependsOn(tasks.precompileJte)
     from(fileTree("jte-classes") {
         include("**/*.class")
         include("**/*.bin") // Only required if you use binary templates

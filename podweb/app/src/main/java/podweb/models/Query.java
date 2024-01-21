@@ -156,7 +156,6 @@ public class Query<T> {
                 try {
                     set.next();
                     int id = set.getInt("id");
-                    System.out.println("found id  " + id);
                     return id;
                 } catch (SQLException e) {
                     return affectedRows; // no id in this table, just ignore
@@ -170,9 +169,6 @@ public class Query<T> {
     }
 
     private static void applyParamsOnStatement(PreparedStatement statement, Object[] list) {
-        for (Object object : list) {
-            System.out.println(object);
-        }
         int cnt = 1;
         try {
 
@@ -193,7 +189,7 @@ public class Query<T> {
                 }
             }
         } catch (Exception e) {
-            System.out.println("apply exceptions: " + e);
+            System.out.println("applyParamsOnStatement exceptions: " + e);
         }
     }
 
@@ -206,7 +202,6 @@ public class Query<T> {
                     continue;
                 field.setAccessible(true);
                 list.add(field.get(object));
-                System.out.println("added to object: " + list);
             }
         } catch (Exception e) {
             System.out.println("Query object to map error: " + e);
@@ -234,7 +229,6 @@ public class Query<T> {
                         field.set(item, set.getObject(field.getName()));
                     } catch (SQLException e) {
                         // The field is not found, just skip it
-                        System.out.println("field not found " + field.getName() + " : ");
                         continue;
                     }
                 }

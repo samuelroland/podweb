@@ -85,7 +85,6 @@ public class EpisodesController {
 
         try {
             int progression = Integer.parseInt(ctx.formParam("progression"));
-            System.out.println("episode id" + episode.id + " and userid " + user_id);
             Listen listen = Listen.o.find(Map.of("user_id", user_id, "episode_id", episode.id));
 
             boolean newListen = false;
