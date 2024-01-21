@@ -12,7 +12,7 @@ AS
 CREATE OR REPLACE VIEW podcasts_ranking
 AS
 	SELECT p.id, p.title, p.image, p.author, sum(listenings_sum) as listenings_total from podcasts p
-	INNER JOIN episodes_ranking ON episodes_ranking.podcast_id = podcast_id
+	INNER JOIN episodes_ranking ON episodes_ranking.podcast_id = p.id
 	GROUP BY p.id
 	ORDER BY listenings_total DESC;
 
