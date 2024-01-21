@@ -28,9 +28,8 @@ Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
   - [Vues](#vues)
 - [Développement](#développement)
   - [Prérequis](#prérequis)
-- [Déploiement](#déploiement)
-  - [Image docker](#image-docker)
-  - [Mise en place](#mise-en-place)
+- [Déploiement en production](#déploiement-en-production)
+  - [Mise en place développement](#mise-en-place-développement)
   - [Lancement des tests](#lancement-des-tests)
   - [Développement des vues](#développement-des-vues)
   - [Tricks mis en place pour l'écriture de tests automatisés](#tricks-mis-en-place-pour-lécriture-de-tests-automatisés)
@@ -168,6 +167,8 @@ Voici les outils que nous utilisons pour implémenter notre application web en J
 3. [JTE](https://jte.gg/) : système de template permettant d'écrire facilement des vues en HTML
 4. [TailwindCSS](https://tailwindcss.com/) : un framework CSS très puissant et orienté sur des classes utilitaires
 5. JUnit: le classique framework de test en Java
+
+Nous utilisons le design pattern MVC (Modèle Vue Controlleur) pour structurer notre application Javalin.
 
 ### Différences avec cahier des charges
 
@@ -333,41 +334,42 @@ La vue `podcasts_ranking` utilise la vue précédente pour récupérer le nombre
 4. [Docker](https://docs.docker.com/get-docker/)
 5. [NPM](https://www.npmjs.com/get-npm) (utilisé pour mettre à jour le CSS avec TailwindCSS)
 
-## Déploiement
-Voici les commandes pour déployer notre application sur un serveur. Les commandes sont à lancer dans le dossier `podweb`.
+## Déploiement en production
+Voici les commandes pour déployer notre application. Les commandes sont à lancer dans le dossier `podweb`.
 
-D'abord, il faut faire un build optimisé pour la production des styles CSS. Le fichier produit est toujours le même : `./app/src/main/static/out.css`, il est cependant minifié pour être le plus léger possible.
-```sh
-npm run prod
-```
-
-Pour builder le projet dans un "fat jar" c'est-à-dire une archive `.jar` qui contient toutes les dépendances utiles en dehors du développement :
-```sh
-gradle uberJar
-```
-L'archive générée est présente au chemin suivant : `app/build/libs/app-uber.jar`.
-
-Pour exécuter notre archive avec `java -jar ...`, la variable d'environnement `PODWEB_PRODUCTION` doit être définie, elle permet d'indiquer qu'il faut utiliser les versions compilées des templates JTE chargées dans le JAR et non les chercher dans le dossier originel. Il faut également qu'un dossier static soit présent à côté et que le `out.css` soit copié dedans.
-```sh
-PODWEB_PRODUCTION="" java -jar app/build/libs/app-uber.jar
-```
-
-### Image docker
-Afin de facilement lancer ou déployer notre application, nous avons créé un `Dockerfile` dédié :
-
-Note : les commandes sont toujours à lancer dans le dossier `podweb`.
-
-Préparatifs et docker build de l'image :
-```sh
-./prod.sh
-```
-
-```sh
-docker compose up
-```
-
-### Mise en place
 Note : Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradlew` sous Linux ou MacOS (`chmod +x ./gradlew` si erreur d'exécution), et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).
+
+1. Ajouter `podweb-data.sql` dans le dossier `db/setup`.
+1. Compiler les assets
+    ```sh
+    npm i
+    npm run prod
+    ```
+
+1. Configurer la DB en créant un fichier `.env` dans le dossier `podweb`
+    ```env
+    DB_PORT=5432
+    DB_USER=bdr
+    DB_PWD=bdr
+    ```
+
+1. Pour builder le projet dans un "fat jar" c'est-à-dire une archive `.jar` qui contient toutes les dépendances utiles en dehors du développement :
+    ```sh
+    gradle uberJar
+    ```
+
+1. Afin de facilement lancer ou déployer notre application, nous avons créé un `docker-compose.yml` pour l'infra, il suffit de lancer
+    ```sh
+    docker compose build
+    docker compose up
+    ```
+
+1. Ouvrir le navigateur sur `localhost:7000`.
+
+1. Se connecter avec Eulalia: 'stokes.ena@example.org' et 'pass'
+
+### Mise en place développement
+Variante d'installation pour le développement...
 
 1. Cloner le repos
     ```sh
@@ -384,13 +386,18 @@ Note : Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle`
 1. Pour configurer la base de données, il suffit de créer un fichier `.env` et d'indiquer les identifiants
    ```env
     DB_PORT=5432
-    DB_USER=
-    DB_PWD=
+    DB_USER=bdr
+    DB_PWD=bdr
    ```
-11. Pour lancer notre base de données PostgreSQL (se mettre dans le dossier `podweb`)
+1. Pour lancer notre base de données PostgreSQL (se mettre dans le dossier `podweb`)
      ```sh
-     docker compose up -d
+     docker compose up postgresql
      ```
+1. Setup la db
+    ```sh
+    cd db/setup
+    bash db.sh
+    ```
 1. Pour lancer l'application directement (build + run)
     ```sh
     gradle run
