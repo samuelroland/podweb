@@ -7,7 +7,7 @@
 !{var css = respond ? "mt-2 ml-4" : "mt-10";}
 
 
-<form class="${css} bg-slate-200 rounded-md p-2" style="margin-left: ${shift}px" method="post">
+<form class="${css} bg-slate-200 rounded-md p-2" style="margin-left: ${shift}px" method="post" action="/episodes/${episodeId}/comments">
     <div class="flex">
         <h4 type="text" class="flex-1">${respond ? "Respond to comment" : "Leave a comment"}</h4>
         <input disabled="${!logged}" type="number" min="0" max="5" name="note" class="w-16 mx-4 h-5">

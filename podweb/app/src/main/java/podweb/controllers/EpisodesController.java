@@ -18,7 +18,7 @@ public class EpisodesController {
         try {
             Episode e = Episode.o.find(Integer.parseInt(ctx.pathParam("id")));
             if (e == null) {
-                ctx.render("Episode not found");
+                ctx.result("Episode not found");
                 return;
             }
 
@@ -43,11 +43,26 @@ public class EpisodesController {
                 }
                 authors = User.o.getByIdList(userIds);
             }
+            Listen listen = null;
+
+            if (App.logged(ctx)) {
+                listen = e.listen(((User) App.loggedUser(ctx)).id);
+            }
+
+            // In case there is no listen or we are not logged
+            if (listen == null) {
+                // Just an empty non saved listen to avoid passing null
+                listen = new Listen();
+                listen.progression = 0;
+                listen.listening_count = 0;
+            }
+
             ctx.render("episode.jte",
                     Map.of("loggedUser", App.loggedUser(ctx),
                             "episode", e, "comments", comments,
                             "authors", authors,
-                            "commentsLevelById", commentsLevelById));
+                            "commentsLevelById", commentsLevelById,
+                            "listen", listen));
         } catch (NumberFormatException e) {
             ctx.status(404);
         }

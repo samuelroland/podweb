@@ -1,6 +1,9 @@
 package podweb.models;
 
 import java.sql.Timestamp;
+import java.util.Map;
+
+import podweb.App;
 
 public class Episode extends Model<Episode> {
     public int id;
@@ -27,5 +30,9 @@ public class Episode extends Model<Episode> {
     public String duration() {
         // https://stackoverflow.com/questions/266825/how-to-format-a-duration-in-java-e-g-format-hmmss
         return String.format("%d:%02d:%02d", duration / 3600, (duration % 3600) / 60, (duration % 60));
+    }
+
+    public Listen listen(int userId) {
+        return Listen.o.find(Map.of("episode_id", id, "user_id", userId));
     }
 }

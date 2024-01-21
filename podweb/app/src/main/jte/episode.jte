@@ -1,6 +1,7 @@
 @import podweb.models.Comment
 @import podweb.models.Episode
 @import podweb.models.User
+@import podweb.models.Listen
 @import java.util.ArrayList
 @import java.util.Map
 
@@ -8,13 +9,14 @@
 @param ArrayList<Comment> comments
 @param Episode episode
 @param Object loggedUser
+@param Listen listen
 @param Map<Integer, Integer> commentsLevelById
 
 !{var logged = loggedUser instanceof User;}
 
 @template.layout(
 content = @`
-@template.episode-details(episode=episode, withDetails=true, logged=logged)
+@template.episode-details(episode=episode, withDetails=true, logged=logged, listen=listen)
 
 <h2 class="mt-10">Comments (${comments.size()})</h2>
 @if (comments.isEmpty())

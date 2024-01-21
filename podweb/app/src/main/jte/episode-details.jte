@@ -1,15 +1,17 @@
 @import podweb.models.Episode
 @import podweb.models.Podcast
 @import podweb.models.User
+@import podweb.models.Listen
 
 @param Episode episode
 @param boolean withDetails = false
 @param boolean logged = false
+@param Listen listen = null
 
 <div class="my-3">
     <div class="flex items-center">
-        <a href="/episodes/${episode.id}">
-            <p class="flex-1 font-bold my-2 text-2xl line-clamp-1 podcast-link-title" title="${episode.title}">${episode.title}</p>
+        <a href="/episodes/${episode.id}" class="flex-1">
+            <p class=" font-bold my-2 text-2xl line-clamp-1 podcast-link-title" title="${episode.title}">${episode.title}</p>
         </a>
         <span class="flex items-center mr-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mr-2">
@@ -66,18 +68,24 @@
                     } else {
                         $data.done = false;
                     }
+                },
+                setup() {
+                    setInterval($data.sendProgress, 1000 * 15);
+                    $refs.el.currentTime = ${listen.progression} - 3;
+                    if ($refs.el.currentTime < 0) $refs.el.currentTime = 0;
                 }
             }"
-            x-init="setInterval(sendProgress, 1000 * 15);"
+            x-init="setup()"
         >
             <audio src="${episode.audio_url}"
                 @play="play = true" 
                 @pause="play = false" 
                 @timeupdate="saveProgress($event)" 
                 preload="metadata"
+                @seeked="sendProgress()"
                 @durationchange="duration = $event.target.duration"
                 controls
-                class="w-full my-3 border-blue-600 border rounded-md bg-blue-100">
+                class="w-full my-3 border-blue-600 border rounded-md bg-blue-100" x-ref="el">
             </audio>
         </div>
     @endif
