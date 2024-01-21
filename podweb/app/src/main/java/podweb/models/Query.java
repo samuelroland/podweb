@@ -102,7 +102,6 @@ public class Query<T> {
         return -1;
     }
 
-    // TODO: add try with resources
     public ArrayList<T> query(String query) {
         return query(query, null);
     }
@@ -112,7 +111,7 @@ public class Query<T> {
     }
 
     public ArrayList<T> query(String query, Object[] list) {
-        System.out.println("query(): " + query);
+        System.out.println("Query(): " + query);
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             if (list != null)
@@ -146,13 +145,12 @@ public class Query<T> {
             PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             if (list != null)
                 applyParamsOnStatement(statement, list);
-            System.out.println("Query: " + query);
+            System.out.println("Query update: " + query);
             System.out.println("Params: ");
             for (Object object : list) {
                 System.out.print(object + " ");
             }
             int affectedRows = statement.executeUpdate();
-            System.out.println("isInsert " + isInsert);
             if (isInsert) {
                 ResultSet set = statement.getGeneratedKeys();
                 try {
@@ -172,7 +170,6 @@ public class Query<T> {
     }
 
     private static void applyParamsOnStatement(PreparedStatement statement, Object[] list) {
-        System.out.println("applyParamsOnStatement() Params: ");
         for (Object object : list) {
             System.out.println(object);
         }
@@ -190,8 +187,6 @@ public class Query<T> {
                 } else if (object instanceof String o) {
                     statement.setString(cnt++, o);
                 } else if (object instanceof Timestamp o) {
-                    System.out.println("found date ! " + cnt);
-                    // statement.setString(cnt++, o.toString());
                     statement.setTimestamp(cnt++, o);
                 } else if (object instanceof Object o) {
                     statement.setObject(cnt++, o);

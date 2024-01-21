@@ -88,7 +88,6 @@ public class EpisodesController {
             System.out.println("episode id" + episode.id + " and userid " + user_id);
             Listen listen = Listen.o.find(Map.of("user_id", user_id, "episode_id", episode.id));
 
-            System.out.println("goooo");
             boolean newListen = false;
             if (listen == null) {
                 newListen = true;
@@ -104,7 +103,6 @@ public class EpisodesController {
                 listen.progression = progression;
             }
 
-            System.out.println("fix it !" + newListen);
             if (newListen) {
                 listen.create();
             } else {
