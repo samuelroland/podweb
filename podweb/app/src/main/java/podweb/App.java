@@ -58,6 +58,7 @@ public class App {
         // Episodes and comments related routes
         EpisodesController episodesController = new EpisodesController();
         app.get("/episodes/{id}", episodesController::episodeDetails);
+        app.post("/episodes/{id}/progression", episodesController::updateListenProgression);
         app.post("/episodes/{id}/comments", podcastsController::addComment);
         app.post("/comments/{id}/delete", podcastsController::deleteComment);
 

@@ -163,11 +163,14 @@ public abstract class Model<T> {
         query += attributes + ") values (" + interogationMarks + ");";
         Integer nb = getQuery().update(query, this);
         if (nb > 0) {
-            try {
-                // Try to set id (it may fails)
-                getClass().getField("id").set(this, nb);
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-                e.printStackTrace();
+            if (hasId()) {
+                try {
+                    // Try to set id (it may fails)
+                    getClass().getField("id").set(this, nb);
+                } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+                        | SecurityException e) {
+                    e.printStackTrace();
+                }
             }
         } else if (nb == 0) {
             return false; // not an id but 0 line affected so action failed

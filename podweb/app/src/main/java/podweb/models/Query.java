@@ -149,7 +149,7 @@ public class Query<T> {
             System.out.println("Query: " + query);
             System.out.println("Params: ");
             for (Object object : list) {
-                System.out.println(object);
+                System.out.print(object + " ");
             }
             int affectedRows = statement.executeUpdate();
             System.out.println("isInsert " + isInsert);
@@ -180,7 +180,6 @@ public class Query<T> {
         try {
 
             for (Object object : list) {
-                System.out.println("obj apply " + object);
                 if (object == null) {
                     statement.setNull(cnt++, java.sql.Types.NULL);
                 }
@@ -207,7 +206,8 @@ public class Query<T> {
         ArrayList<Object> list = new ArrayList<>();
         try {
             for (Field field : object.getClass().getDeclaredFields()) {
-                if (field.getName().equals("o") || field.getName().equals("q") || field.getName().equals("id"))
+                if (field.getName().equals("o") || field.getName().equals("keys") || field.getName().equals("q")
+                        || field.getName().equals("id"))
                     continue;
                 field.setAccessible(true);
                 list.add(field.get(object));
@@ -232,7 +232,7 @@ public class Query<T> {
                 Constructor<T> ctor = ref.getConstructor();
                 T item = ctor.newInstance();
                 for (Field field : fields) {
-                    if (field.getName().equals("o") || field.getName().equals("q"))
+                    if (field.getName().equals("o") || field.getName().equals("keys") || field.getName().equals("q"))
                         continue;
                     try {
                         set.findColumn(field.getName());
