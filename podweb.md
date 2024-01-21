@@ -24,10 +24,6 @@ Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
   - [Différences avec cahier des charges](#différences-avec-cahier-des-charges)
   - [Modèles](#modèles)
   - [Opérations sur la base de donnée (CRUD)](#opérations-sur-la-base-de-donnée-crud)
-    - [Création](#création)
-    - [Suppression](#suppression)
-    - [Mise à jour](#mise-à-jour)
-    - [Obtention](#obtention)
   - [Triggers](#triggers)
   - [Vues](#vues)
 - [Développement](#développement)
@@ -167,11 +163,11 @@ données. Pour d'éventuelles futures améliorations.
 
 ### Java stack
 Voici les outils que nous utilisons pour implémenter notre application web en Java :
-1. Javalin : un petit framework web léger et rapide
-2. Gradle : nous voulions tester autre chose que Maven pour gérer les dépendances, les builds et l'exécution de tests, nous avons pris son alternative.
+1. [Javalin](https://javalin.io/) : un petit framework web léger et rapide
+2. [Gradle](https://gradle.org/) : nous voulions tester autre chose que Maven pour gérer les dépendances, les builds et l'exécution de tests, nous avons pris son alternative.
 3. [JTE](https://jte.gg/) : système de template permettant d'écrire facilement des vues en HTML
-4. TailwindCSS : un framework CSS très puissant et orienté sur des classes utilitaires
-5. JUnit : le classique framework de test en Java
+4. [TailwindCSS](https://tailwindcss.com/) : un framework CSS très puissant et orienté sur des classes utilitaires
+5. JUnit: le classique framework de test en Java
 
 ### Différences avec cahier des charges
 
@@ -295,23 +291,18 @@ public class Queue extends Model<Queue> {
 
 Nous avons implémenté les opérations CRUD dans ces situations : 
 
-#### Création
+1. **Création**
+    - Création d'un nouveau commentaire → `Model.create()`, utilisé lorsqu'on veut rajouter de nouveau commentaires sous chaque épisode.
 
-- Création d'un nouveau commentaire → Méthode create de `Model`, utilisé lorsqu'on veut rajouter de nouveau commentaires sous chaque épisode.
+1. **Suppression**
+    - Suppression d'un commentaire → `Model.delete()`, utilisé lorsqu'on veut supprimer un commentaire que l'on a posté.
 
-#### Suppression
+1. **Mise à jour**
+    - Mise à jour de la progression d'écoute d'un épisode → `Model.update()`, utilisé lorsqu'on écoute un épisode et que l'on veut sauvegarder notre progression.
 
-- Suppression d'un commentaire → Méthode delete de `Model`, utilisé lorsqu'on veut supprimer un commentaire que l'on a posté.
-
-#### Mise à jour
-
-- Mise à jour de la progression d'écoute d'un épisode → Méthode update de `Model`, utilisé lorsqu'on écoute un épisode et que l'on veut sauvegarder notre progression.
-
-#### Obtention
-
-- Liste des épisodes, podcasts, utilisateurs, commentaires, badges, playlists, etc. → Méthode all de `Model`, utilisé lorsqu'on veut afficher une liste d'épisodes, de podcasts, etc.
-
-- Un épisode, podcast, utilisateur, commentaire, badge, playlist, etc. → Méthode getBy de `Model`, utilisé lorsqu'on veut afficher un épisode, un podcast, etc, avec un id spécifique.
+1. **Obtention**
+    - Liste des épisodes, podcasts, utilisateurs, commentaires, badges, playlists, etc. → `Model.all()`, utilisé lorsqu'on veut afficher une liste d'épisodes, de podcasts, etc.
+    - Un épisode, podcast, utilisateur, commentaire, badge, playlist, etc. → `Model.getBy()`, utilisé lorsqu'on veut récupérer une liste d'éléments filtrés par une clé étrangère d'une relation.
 
 ### Triggers 
 
@@ -337,7 +328,7 @@ La vue `podcasts_ranking` utilise la vue précédente pour récupérer le nombre
 
 ### Prérequis
 1. JDK 21
-2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors, il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas, mais peuvent être reprise du `package.json`.
+2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS)
 3. [Gradle](https://gradle.org/install/) (optionnel, mais recommandé)
 4. [Docker](https://docs.docker.com/get-docker/)
 5. [NPM](https://www.npmjs.com/get-npm) (utilisé pour mettre à jour le CSS avec TailwindCSS)
@@ -382,9 +373,9 @@ Note : Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle`
     ```sh
     git clone https://github.com/samuelroland/podweb
     ```
-1. Pour installer tailwindcss via NPM
+1. Pour installer les dépendances via NPM
     ```sh
-    npm install -D tailwindcss
+    npm i
     ```
 1. Pour charger le style une première fois (obligatoire lorsqu'il y a du changement dans les pages html ou css)
     ```sh
