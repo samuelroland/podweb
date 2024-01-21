@@ -4,6 +4,7 @@
 
 @param Episode episode
 @param boolean withDetails = false
+@param boolean logged = false
 
 <div class="my-3">
     <div class="flex items-center">
@@ -34,8 +35,35 @@
     </div>
 
     <div class="text-gray-600 flex-1 block line-clamp-6">$unsafe{episode.description.replace("\\n", "")}</div>
-
     @if(withDetails)
-    <audio src="${episode.audio_url}" controls class="w-full my-3"></audio>
+        <div
+            x-data="{
+                eid: ${ episode.id },
+                play: false,
+                progress: 0,
+                latestProgress: 0,
+                logged: ${logged},
+                sendProgress: () => {
+                    if ($data.logged == false || $data.latestProgress == $data.progress) return;
+                    fetch('/episodes/' + $data.eid + '/progression',
+                        {
+                            method: 'POST',
+                            body: 'progression='+ Math.floor($data.progress)
+                        }
+                    );
+                    $data.latestProgress = $data.progress;
+                }
+            }"
+            x-init="setInterval(sendProgress, 1000 * 15);"
+        >
+            <audio src="${episode.audio_url}"
+                @play="play = true" 
+                @pause="play = false" 
+                @timeupdate="progress = $event.target.currentTime" 
+                preload="metadata"
+                controls
+                class="w-full my-3 border-blue-600 border rounded-md bg-blue-100">
+            </audio>
+        </div>
     @endif
 </div>

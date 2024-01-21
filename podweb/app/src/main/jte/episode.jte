@@ -10,9 +10,11 @@
 @param Object loggedUser
 @param Map<Integer, Integer> commentsLevelById
 
+!{var logged = loggedUser instanceof User;}
+
 @template.layout(
 content = @`
-@template.episode-details(episode=episode, withDetails=true)
+@template.episode-details(episode=episode, withDetails=true, logged=logged)
 
 <h2 class="mt-10">Comments (${comments.size()})</h2>
 @if (comments.isEmpty())
@@ -22,7 +24,6 @@ content = @`
 <br>
 @endif
 
-!{var logged = loggedUser instanceof User;}
 !{var loggedUserId = logged ? ((User) loggedUser).id : -1;}
 !{var PIXEL_SHIFT = 40;}
 @for(Comment c: comments)

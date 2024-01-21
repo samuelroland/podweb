@@ -96,7 +96,7 @@ public class EpisodesController {
             } else {
                 listen.update();
             }
-            ctx.result("success!");
+            ctx.result("Progression saved!");
         } catch (NumberFormatException e) {
             ctx.result("Invalid progression");
             return;
