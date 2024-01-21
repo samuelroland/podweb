@@ -1,8 +1,8 @@
 # Podweb
 Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
-<!-- TODO: faire une joli page de titre avec saut de page ! -->
-<!-- TODO: inclure photo de l'app sur la page de titre ! -->
-<!-- TODO: faire un joli export -->
+<!-- TODO : faire une jolie page de titre avec saut de page ! -->
+<!-- TODO : inclure photo de l'app sur la page de titre ! -->
+<!-- TODO : faire un joli export -->
 <img src="PodWebLogo.png" width="500" height="500" alt="Logo de podweb">
 
 <p style="page-break-before: always"></p>
@@ -10,8 +10,11 @@ Réalisé par Arthur Junod, Samuel Roland et Edwin Häffner
 
 ## Introduction
 
-Dans le cadre du cours de base de données relationnelles, nous avons réalisé un projet de développement d'une
-application web en Java permettant d'écouter et d'interagir avec des podcasts, ajouter des commentaires,
+Dans le cadre du cours de base de données relationnelles, il nous a été demandé de réaliser une application qui utilise une base donnée.
+Certaines implémentations nous ont été imposées comme l'utilisation de toutes les opérations CRUD, la création et utilisation de vues et la 
+création et utilisation de triggers. Il fallait également une UI qui nous permet de modifier la base de donnée.
+
+Nous avons donc réalisé un projet de développement d'une application web en Java permettant d'écouter et d'interagir avec des podcasts, ajouter des commentaires,
 des notes, etc.
 
 ## Fonctionnalités
@@ -34,6 +37,53 @@ Notre application web permet de faire les choses suivantes :
 
 7. Possibilité de voir son profil et les badges obtenus (badges d'écoute, de commentaires, etc.)
 
+## Utilisation
+
+### Accueil
+
+La page d'accueil affiche tous les podcasts avec leur image, titre, auteurs et nombres d'épisodes.
+Les boutons en haut de la page nous permettent de se déplacer dans les autres vues décrites par ces boutons.
+Si l'on est connécté notre nom d'utilisateur est affiché à côté du bouton `Login` et il est possible de cliquer dessus
+pour accéder à notre page d'utilisateur.
+Cliquer sur un podcast nous amène à la page qui affiche les détails de celui-ci.
+
+### Détail d'un podcast
+
+Dès qu'on clique sur un podcast, on arrive sur la page de celui-ci (lien : `/podcast/<id>`) .
+On peut y voir l'image du podcast en question et une liste de tous les épisodes à la suite avec leur titre, description et durée. 
+
+On peut ensuite cliquer sur l'un des épisodes que l'on veut écouter, soit sur le nom en lui-même ou bien en cliquant sur l'icône play à côté du titre.
+
+### Detail d'un épisode
+
+L'affichage d'un podcast se fait par l'affichage de son nom, sa description et sa durée.
+C'est ici qu'on peut écouter un épisode avec un simple lecteur audio et également voir les commentaires et les notes liés celui-ci.
+Si on est connecté, on peut aussi voir le nombre d'écoutes que l'on a pour cet épisode et 
+nous même commenter, noter l'épisode et répondre à d'autres commentaires.
+
+### Ranking
+
+La page ranking peut être atteinte à tout moment depuis le bouton `Ranking` en haut de la page.
+On y voit une liste qui classe les podcasts par leur nombre d'écoutes.
+Chaque podcast a son titre, son image, son auteur et son nombre d'écoutes affiché.
+On peut toujours cliquer sur l'un deux pour accéder à ses détails.
+
+### Recherche
+
+À tout moment, on peut cliquer sur le bouton `Search` en haut de la page pour accéder à la page de recherche.
+On peut y rechercher des épisodes en fonction de leur titre, description, auteurs ou encore titre de podcast. 
+
+On obtient alors une liste d'épisodes qui correspondent à la recherche suivie d'une description du podcast lié à celui-ci et une image du podcast. On peut cliquer sur un épisode pour accéder à sa page de détail ou bien, on peut cliquer sur le podcast correspondant à l'épisode pour arriver sur la page de détail d'un podcast.
+
+### Liste d'utilisateurs
+
+La page `Users` (lien : `/users`) permet de lister tous les utilisateurs de *Podweb*.
+On peut cliquer sur chaque utilisateur afin d'accéder à leur page.
+
+### Page utilisateur
+
+La page utilisateur affiche le nom et prénom de l'utilisateur choisi, sa date d'inscription, la liste des badges qu'il a 
+obtenues et la liste des playlists qu'il a créées.
 
 ## Implémentation
 
@@ -45,22 +95,91 @@ que 10 dans l'application pour des raisons de temps et de complexité d'impléme
 ![mld.svg](./db/docs/mld.svg)
 
 Les tables `categories` et `queue` ne sont pas utilisées dans l'application, mais sont encore présentes dans la base de
-données. Pour d'eventuelles futures améliorations.
+données. Pour d'éventuelles futures améliorations.
 
 ### Java stack
-Voici les outils que nous utilisons pour implémenter notre application web en Java:
-1. Javalin: un petit framework web léger et rapide
-2. Gradle: nous voulions tester autre chose que Maven pour gérer les dépendences, les builds et l'exécution de tests, nous avons pris son alternative.
-3. [JTE](https://jte.gg/): système de template permettant d'écrire facilement des vues en HTML
-4. TailwindCSS: un framework CSS très puissant et orienté sur des classes utilitaires
-5. Junit: le classique framework de test en Java
+Voici les outils que nous utilisons pour implémenter notre application web en Java :
+1. Javalin : un petit framework web léger et rapide
+2. Gradle : nous voulions tester autre chose que Maven pour gérer les dépendences, les builds et l'exécution de tests, nous avons pris son alternative.
+3. [JTE](https://jte.gg/) : système de template permettant d'écrire facilement des vues en HTML
+4. TailwindCSS : un framework CSS très puissant et orienté sur des classes utilitaires
+5. JUnit : le classique framework de test en Java
+
+### Différences avec cahier des charges
+
+Toutes ces différences peuvent principalement être expliquées par le manque de temps. Ces fonctionnalités non-implémentées
+ont été laissées de côtés au profit de certaines qui nous semblaient plus urgentes ou importantes à implémenter.
+
+- Nous voulions implémenter des catégories et les utiliser dans le ranking, la recherche et l'affichage des podcasts.
+Elles sont malgré tout présentes dans la base de données et elle catégorisent justement les podcasts, elles ne sont juste
+pas manipulées ou utilisées dans l'UI.
+- Le ranking n'affiche pas l'épisode le plus écouté. Cependant, la vue qui liste 
+les épisodes avec leurs écoutes est présente et pourrait être utilisée pour trouver facilement l'épisode le plus écouté par podcast.
+- Pareillement le nombre total d'écoutes n'est pas affiché par épisode, même si la vue citée au-dessus permet de le faire.
+- La file d'attente n'est pas présente. Nous avons priorisé les commentaires pour les opérations CRUD.
+- On ne peut pas gérer des playlists.
+- Un compte ne peut pas être créé ou supprimé.
+
+Dans la première version du cahier des charges les commentaires et les badges n'apparaissaient pas. Ils ont été rajouté par la suite
+respectivement pour augmenter le nombre de tables de la base de données et pour implémenter des triggers.
+
+Les triggers des badges en relations avec les playlists ne marchent donc pas, car elles ne peuvent pas être créées.
+
+### Modèles
+
+Dans notre application, nous devons communiquer avec la base de données. Ne pouvant pas utiliser d'ORM, 
+nous en avons fait un plus simple de toute pièce.
+
+Chaque modèle implémente la classe `Model`. Cette classe abstraite permet de fournir plusieurs des requêtes SQL communes à
+tous les modèles qui l'implémente. Cette classe marche un unison avec la classe `Query` dont une instance est créée dans chaque
+modèle, c'est sur cette instance que `Model` exécute ses requêtes. 
+
+`Query` est la classe qui va permettre de faire le lien entre les classes java modèles que nous avons créés et les tables de
+la base de donnée. 
+
+Elle nous permet :
+1. De mapper directement les colonnes et la table aux paramètres de notre classe ou inversement.
+2. De garder la configuration pour la connection à la base de données en "mémoire".
+3. De transformer le `ResultSet` que nous renvoie *JDBC* en une `ArrayList<Object>` plus simple à manipuler et utiliser avec *JTE*.
+
+### Operations sur la base de donnée (CRUD)
+
+Nous avons implémenté les opérations CRUD dans ces situations : 
+
+#### Création :
+
+- Création d'un nouveau commentaire → Méthode create de `Model`, utilisé lorsqu'on veut rajouter de nouveau commentaires sous chaque épisode.
+
+#### Délétion :
+
+- Suppression d'un commentaire → Méthode delete de `Model`, utilisé lorsqu'on veut supprimer un commentaire que l'on a posté.
+
+#### Mise à jour :
+
+- Mise à jour de la progression d'écoute d'un épisode → Méthode update de `Model`, utilisé lorsqu'on écoute un épisode et que l'on veut sauvegarder notre progression.
+
+#### Obtention :
+
+- Liste des épisodes, podcasts, utilisateurs, commentaires, badges, playlists, etc. → Méthode all de `Model`, utilisé lorsqu'on veut afficher une liste d'épisodes, de podcasts, etc.
+
+- Un épisode, podcast, utilisateur, commentaire, badge, playlist, etc. → Méthode getBy de `Model`, utilisé lorsqu'on veut afficher un épisode, un podcast, etc, avec un id spécifique.
+
+### Triggers : 
+
+Nous utilisons les triggers seulement dans le cas de mise à jour des badges. Lorsque nous, par exemple, postons plus de 10 messages. Donc à chaque insertion de nouveau message dans la base de donnée, le trigger va vérifier si nous avons atteint le nombre de messages requis pour obtenir le badge. Si c'est le cas, il va l'ajouter à notre liste de badges.
+
+On fait de même avec le nombre d'écoutes.
+
+### Vues
+
+Nous utilisons les vues dans notre classement afin de savoir le nombre total d'écoutes qu'a chaque podcast.
 
 ## Développement
 
 ### Prérequis
 1. JDK 21
-2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas mais peuvent être reprise du `package.json`.
-3. [Gradle](https://gradle.org/install/) (optionnel mais recommandé)
+2. [NodeJS](https://nodejs.org/en) (pour avoir NPM et ainsi facilement installer TailwindCSS). Ou alors, il est possible d'installer le [CLI Tailwindcss directement également...](https://tailwindcss.com/blog/standalone-cli), dans ce cas les commandes `npm run <x>` ne marcheront pas, mais peuvent être reprise du `package.json`.
+3. [Gradle](https://gradle.org/install/) (optionnel, mais recommandé)
 4. [Docker](https://docs.docker.com/get-docker/)
 5. [NPM](https://www.npmjs.com/get-npm) (utilisé pour mettre à jour le CSS avec TailwindCSS)
 
@@ -98,7 +217,7 @@ docker compose up
 ```
 
 ### Mise en place
-Note: Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradlew` sous Linux ou MacOS (`chmod +x ./gradlew` si erreur d'exécution), et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).
+Note : Si vous n'avez pas installé Gradle, il suffit de substituer les `gradle` dans les commandes suivantes par `./gradlew` sous Linux ou MacOS (`chmod +x ./gradlew` si erreur d'exécution), et par `.\gradlew` sous Windows (installer Gradle permet de se simplifier un peu la vie).
 
 1. Cloner le repos
     ```sh
@@ -143,7 +262,7 @@ gradle run -q
 ```
 
 ### Lancement des tests
-Pour lancer les tests, il suffit de les lancer via une intégration d'IDE ou alors en ligne de commande:
+Pour lancer les tests, il suffit de les lancer via une intégration d'IDE ou alors en ligne de commande :
 ```sh
 gradle test
 # ou encore mieux en mode continuous !
@@ -155,14 +274,14 @@ Nous avons choisi [JTE - Java Template Engine](https://jte.gg/) pour facilement 
 
 Toutes les vues sont sous `podweb/app/src/main/jte` et notre style CSS sous `podweb/app/src/main/static`.
 
-Pour que les nouvelles classes Tailwind soient bien ajoutés à la volée dès qu'on les ajoutes dans nos templates `.jte` ou qu'on modifie le `style.css`, il faut lancer avoir un processus du CLI tailwindcss en arrière plan qui "recompile" quand il voit des changements. Pour cela, il suffit de lancer:
+Pour que les nouvelles classes Tailwind soient bien ajoutés à la volée dès qu'on les ajoute dans nos templates `.jte` ou qu'on modifie le `style.css`, il faut lancer avoir un processus du CLI tailwindcss en arrière-plan qui "recompile" quand il voit des changements. Pour cela, il suffit de lancer :
 ```sh
 npm run watch
 ```
 
 Nous utilisons NPM pour facilement installer le tailwindcss et le mettre à jour si besoin. NPM utilise un fichier `package.json` définissant la dépendance `tailwindcss > 3.3.1` et 2 scripts `watch` et `prod` documentés dans ce document.
 
-Note: des extensions d'IDE pour supporter la syntaxe JTE existe pour [IntelliJ](https://plugins.jetbrains.com/plugin/14521-jte/) et [VSCode](https://marketplace.visualstudio.com/items?itemName=maj2c.jte-template-syntax-highlight). Très pratique pour avoir des couleurs utiles et avoir de l'autocomplétion HTML et CSS, tout en ayant les couleurs et propositions liées à Java.
+Note : des extensions d'IDE pour supporter la syntaxe JTE existe pour [IntelliJ](https://plugins.jetbrains.com/plugin/14521-jte/) et [VSCode](https://marketplace.visualstudio.com/items?itemName=maj2c.jte-template-syntax-highlight). Très pratique pour avoir des couleurs utiles et avoir de l'autocomplétion HTML et CSS, tout en ayant les couleurs et propositions liées à Java.
 
 
 ### Tricks mis en place pour l'écriture de tests automatisés
@@ -193,4 +312,4 @@ Permet de développer plus rapidement et vérifier que ça marche sans devoir co
     ```
 
 ## Divers
-- Toutes les icones en SVG viennent de [heroicons.com](heroicons.com) sous licence MIT.
+- Toutes les icônes en SVG viennent de [heroicons.com](heroicons.com) sous licence MIT.
