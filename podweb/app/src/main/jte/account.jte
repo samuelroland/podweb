@@ -4,7 +4,7 @@
 
 <div>
     @if(user instanceof User u)
-    <span class="text-xl mr-5">${u.firstname} ${u.lastname}</span>
+    <span class="text-lg mr-5 font-bold">$unsafe{u.link()}</span>
     <a href="/logout"><button>Logout</button></a>
     @else
     <div class="bg-red-200"></div>

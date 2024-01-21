@@ -20,8 +20,6 @@ public abstract class Model<T> {
         return defaultKeys;
     }
 
-    public static Podcast o = new Podcast();
-
     abstract public Query<T> getQuery();
 
     public ArrayList<T> all() {
