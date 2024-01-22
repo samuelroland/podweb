@@ -21,6 +21,11 @@ services:
       - .:/data:ro
     networks:
       - podweb-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "bdr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   podweb:
     build: .
@@ -34,10 +39,14 @@ services:
       - podweb-net
     ports:
       - 7000:7000
+    depends_on: 
+      dbsetup:
+        condition: service_completed_successfully
 
   dbsetup:
     depends_on: 
-    - postgresql
+      postgresql:
+          condition: service_healthy
     build: ../
     environment:
       - DB_HOST=postgresql
