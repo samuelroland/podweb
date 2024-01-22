@@ -17,7 +17,7 @@ files=(podweb-schema.sql podweb-data.sql podweb-additions.sql)
 for file in "${files[@]}"; do
     echo "
 --- Running $file..."
-	psql -h "$DB_HOST" -U "$PGUSER" -a -f $file -v ON_ERROR_STOP=1 | grep ERROR
+	psql -d "$DB_NAME" -h "$DB_HOST" -U "$PGUSER" -a -f $file -v ON_ERROR_STOP=1 | grep ERROR
 done
 
 echo "
@@ -29,16 +29,16 @@ for table in `grep -Po "(?<=CREATE TABLE).*(?= \()" podweb-schema.sql`; do
     query=("set search_path=podweb; SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${table}));")
 
     # Note: it will throw errors on tables without ID but we can ignore them
-    psql -h "$DB_HOST" -U "$PGUSER" -a -c "$query" -v ON_ERROR_STOP=1 &> /dev/null
+    psql -d "$DB_NAME" -h "$DB_HOST" -U "$PGUSER" -a -c "$query" -v ON_ERROR_STOP=1 &> /dev/null
 done
 
 echo "
 --- Setting all users pwd to 'pass'"
-psql -h "$DB_HOST" -U "$PGUSER" -a -c "set search_path=podweb; update users set password = 'pass';" -v ON_ERROR_STOP=1
+psql -d "$DB_NAME" -h "$DB_HOST" -U "$PGUSER" -a -c "set search_path=podweb; update users set password = 'pass';" -v ON_ERROR_STOP=1
 
 echo "
 --- Setting BabyListener badge condition to 3"
-psql -h "$DB_HOST" -U "$PGUSER" -a -c "set search_path=podweb; update badges set condition_value = 3 where id = 1;" -v ON_ERROR_STOP=1
+psql -d "$DB_NAME" -h "$DB_HOST" -U "$PGUSER" -a -c "set search_path=podweb; update badges set condition_value = 3 where id = 1;" -v ON_ERROR_STOP=1
 
 
 echo "

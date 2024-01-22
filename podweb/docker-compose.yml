@@ -32,6 +32,7 @@ services:
     environment:
       # Loaded from .env
       - DB_HOST=postgresql
+      - DB_NAME=podweb
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PWD=${DB_PWD}
@@ -50,6 +51,7 @@ services:
     build: ../
     environment:
       - DB_HOST=postgresql
+      - DB_NAME=podweb
     volumes:
       - ../:/repos
     networks:

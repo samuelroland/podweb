@@ -17,7 +17,7 @@ public class Query<T> {
     private static Config config;
     private static Connection connection = null;
 
-    record Config(String host, String port, String username, String password) {
+    record Config(String host, String port, String database, String username, String password) {
     }
 
     static private void loadConfig() {
@@ -32,6 +32,12 @@ public class Query<T> {
             port = System.getenv("DB_PORT");
         }
 
+        String database = "podweb";
+        if(env.containsKey("DB_NAME")) {
+            database = System.getenv("DB_NAME");
+        }
+
+
         String username = env.get("DB_USER");
         if (!env.containsKey("DB_USER")) {
             throw new RuntimeException("No env variable DB_USER found ..");
@@ -42,7 +48,7 @@ public class Query<T> {
             throw new RuntimeException("No env variable DB_PWD found ..");
         }
 
-        config = new Config(host, port, username, password);
+        config = new Config(host, port, database, username, password);
     }
 
     public Query(Class<T> ref) {
@@ -56,7 +62,7 @@ public class Query<T> {
 
     static void startConnection() {
         loadConfig();
-        String url = "jdbc:postgresql://" + config.host + ":" + config.port + "/?options=-c%20search_path=podweb%20";
+        String url = "jdbc:postgresql://" + config.host + ":" + config.port + "/" + config.database + "?options=-c%20search_path=podweb%20";
         try {
             connection = DriverManager.getConnection(url, config.username, config.password);
         } catch (SQLException e) {
